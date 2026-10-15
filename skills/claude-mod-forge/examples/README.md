@@ -3,7 +3,7 @@
 Complete, working mods the skill copies from. Each one passes `claude plugin validate`, strict `tsc` and
 `claude plugin test` (run `node ../scripts/check-mod.mjs <name>`). The manifest folder is stored as
 `_claude-plugin` so these examples are never loaded as plugins by accident: rename it to `.claude-plugin`
-in your copy.
+in your copy. Every mod folder has a plain-language README (`README.md`, `README.pt-BR.md`).
 
 Every mod with visible text has a `language` option (`en` default, `pt-BR`) through a pure `hooks/i18n.ts`;
 see "Language option" in `../references/ui-components.md`. Deny reasons Claude reads stay in English.

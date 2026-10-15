@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.5.1 — 2026-10-15
+- Public release prep. The repository moves to evertonalves-ai/mod-forge (same name as the plugin).
+- Plain-language README.md and README.pt-BR.md for each of the 12 example mods: what it does, what you see,
+  step by step, keyboard shortcuts, commands, settings, safety notes, install and check.
+- README and README.pt-BR rewritten for people new to Claude Code, with a list of the example mods and the
+  marketplace install commands.
+- SECURITY.md (private reporting) and CONTRIBUTING.md.
+- Commit history rewritten to the GitHub noreply address.
+
 ## 0.5.0 — 2026-10-15
 - First real-session check (desktop app): the session-dashboard capture exposed three bugs the kit tests missed;
   fixed with tests: tool totals capped at 300, calls stuck "running" after an interruption, bars wrapping.
