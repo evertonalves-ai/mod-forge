@@ -12,6 +12,9 @@ and what must never be assumed. Confirm every source in the `.d.ts` before relyi
   `$.process.run`/`spawn`; files `$.fs`; remote `$.http.fetch`.
 - **Never assume:** billing history, invoices, account quotas or anything `usage()` does not return in this
   build. Optional fields (`cost`, `rateLimits`) may be absent: show "not available", never 0.
+- Push, don't poll: `session.measure` fires after each main-thread turn and when a plan limit changes.
+  Category breakdown like `/context`: `usage({ breakdown: 'summary' })` (local, free); `'full'` costs requests.
+- Pick a command name that is not built in (`/context`, `/cost` are taken).
 - Default: KPI cards + one trend + one list; refresh on the event that changes the value, not a timer.
 
 ## 2. Visual customisation
@@ -25,6 +28,10 @@ and what must never be assumed. Confirm every source in the `.d.ts` before relyi
 - What repeats? What triggers it (event, timer, command)? Conditions and exceptions? How is it undone?
 - Automatic actions that change files or run commands need: a visible log line, an off switch (`userConfig`
   or a button), and a dry-run when the effect is destructive.
+- **User-pressed buttons** need: a defined effect per button (ask what each does — never invent buttons), a
+  busy state when Claude is working (`turn.start`/`turn.complete`), a confirmation for destructive ones, and a
+  text path (`/cmd n`). Prompt buttons use `$.prompt.submit` (queued until idle) or `$.prompt.fill` (draft only).
+  At most 9 numbered hotkeys per view.
 
 ## 4. Custom commands
 - Name? Arguments and their validation? Output (text Claude also reads, or `{}` and a pane)? Must it run while
@@ -37,6 +44,9 @@ and what must never be assumed. Confirm every source in the `.d.ts` before relyi
   What if nobody can answer (`claude -p`)? Should the user be able to switch it off?
 - Distinguish: **observe** (log), **warn** (toast, still runs), **block** (`{ deny }`), **ask** (`$.ui.ask` hold),
   **decide** (`tool.check` → allow/ask/deny).
+- Guard **every tool that runs commands**: `Bash`, `PowerShell` (Windows), `Monitor` (optional `command`), plus
+  any MCP tool that executes code. List them from the tools types (`claude-code-tools`) for the build.
+  Match Windows paths with both separators (`[\\/]` in a regex literal).
 - Must: fail closed; deny text tells Claude what to do instead; document that regex on command text is a
   reminder layer, not a sandbox; recommend permission rules / branch protection for hard guarantees.
 - Never: weaken existing rules silently, or approve in `tool.check` what a deny rule refuses.
@@ -45,6 +55,10 @@ and what must never be assumed. Confirm every source in the `.d.ts` before relyi
 - What is recorded? Where (debug log `$.ui.log(text, { to: 'debug' })`, `$.store`, a file)? For how long?
   Who reads it? What must be redacted?
 - Redact before storing: tokens, keys, `Authorization` headers, `.env` values, passwords in URLs. Cap the size.
+- Default for "log the tool calls": one JSONL file per session in a `userConfig` `directory` folder outside the
+  project, entry = tool, time, duration, status (ok/error/denied), short redacted argument summary; never file
+  contents or tool results. `$.fs` has no append/delete: serialise read-modify-write, roll files under 4 MiB,
+  flush on `turn.complete`, and document manual cleanup.
 
 ## 7. Tool control
 - Which tools (built-in names, `mcp__server__tool`)? Rewrite arguments, retry, answer in place, or withhold results?
@@ -62,7 +76,8 @@ and what must never be assumed. Confirm every source in the `.d.ts` before relyi
 
 ## 10. Integrations & external services
 - Which service and endpoint? Auth method? What data in/out? Rate limits? What when it is down or slow?
-- Token: `userConfig` field with `"sensitive": true`, or an env var read with `$.env.get('LITERAL_NAME')`.
+- Token: `userConfig` field (`type: "string"`, `title`, `"sensitive": true`), or an env var read with
+  `$.env.get('LITERAL_NAME')`. Never ask the user to paste a token into the chat.
   Never in code, tests, logs, toasts, `$.store` or text the model reads.
 - `$.http.fetch`: 30 s total, 4 MiB bodies, ≤ 5 redirects; cross-origin redirects drop `Authorization`.
 - Show offline/error states; back off on failure; never retry in a tight loop.

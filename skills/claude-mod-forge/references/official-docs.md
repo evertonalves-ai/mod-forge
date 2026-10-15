@@ -33,6 +33,16 @@ Desktop app. Types appear in `<mod>/.claude-plugin/types/` after the first load;
 
 Index of all pages: https://code.claude.com/docs/llms.txt
 
+## Community catalogs (ideas and patterns only; audit before installing anything)
+- awesome-claude-code-mods — https://github.com/whyashthakker/awesome-claude-code-mods (70 bundled + community
+  mods; community entries are not audited by the list). Summarised in `idea-catalog.md`.
+- aitmpl.com/mods — site for https://github.com/davila7/claude-code-templates/tree/main/cli-tool/components/mods
+  (47 mods in enterprise, games, integrations, observability, productivity, security, ui). Installs with
+  `npx claude-code-templates --mod <category>/<name>`, which writes the plugin to `.claude/skills/<name>/`;
+  Claude Code auto-loads it as `<name>@skills-dir`. Its README's `userConfig` rules match what validate enforces
+  (see `mods-api.md`). It also says "never pass `$` to a helper": stricter than the docs, which allow top-level
+  helpers in the same file.
+
 ## Samples
 - Built-in mods with tests: https://github.com/anthropics/claude-code/tree/main/mods (`diff`, `agents-md`, `sec-default`, `telemetry`)
 - Playground (Apache-2.0, unsupported): https://github.com/anthropics/claude-code-playground/tree/main/claude-code/mods

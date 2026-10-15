@@ -17,13 +17,18 @@ Answer in the language the user writes in; files and code comments stay in Engli
 3. The `.d.ts` is the authority. Before using any event, method, element, prop or result shape that is not in an
    example here, `grep` it in the `.d.ts` and read the declaration. Docs and this skill can lag the build.
    Never invent an event, method, prop, metric or data source.
+4. Version mismatch: the `.d.ts` may be one build behind the CLI (e.g. types 2.1.293, CLI 2.1.294). Use it, record
+   both versions in the spec, and once the mod has loaded prefer `<mod>/.claude-plugin/types/` (written by the running build).
+5. Where to work: a new mod starts in the session mods folder. An existing mod is edited **where it lives**
+   (load it with `claude --plugin-dir <path>` for hot reload); never copy it into dev-mods. If it lives in a temp or
+   unknown place, ask once where the user keeps mods and offer to move it there.
 
 ## 1. Pick the mode from the request (the user never has to name it)
 
 | The request | Mode | Read |
 |---|---|---|
-| A new mod, idea or vague wish | **create** | `workflows/create.md` |
-| "plan / design / spec first", or a big or risky mod | **plan** | `workflows/plan.md` |
+| A new mod, idea or vague wish | **create** | `workflows/create.md` (+ `references/idea-catalog.md` if the user is unsure what to build) |
+| "plan / design / spec first"; or a mod that approves tool calls, weakens a protection, acts as the user, or sends data out | **plan** first, then create after an explicit yes | `workflows/plan.md` |
 | An existing mod misbehaves, errors, draws nothing | **debug** | `workflows/debug.md` |
 | Add to an existing mod without breaking it | **improve** | `workflows/improve.md` |
 | A pane, dashboard or interactive UI (new or existing) | **create/improve** + `references/ui-components.md` |
@@ -32,7 +37,9 @@ Answer in the language the user writes in; files and code comments stay in Engli
 | "share / publish / install for my team" | **package** | `workflows/package.md` |
 | "continue / pick up where we stopped" | **continue** | `workflows/continue.md` |
 
+A mod that only *restricts* (blocks, asks, warns) stays in create with a full spec; it does not need plan mode.
 An existing mod folder in the conversation or the working directory makes it improve/debug/continue, not create.
+Installing a third-party mod (from a list or marketplace) goes through **audit** first.
 Read the project's `MOD-SPEC.md` and `DECISIONS.md` before asking anything.
 
 ## 2. Interview only for what changes the design
@@ -48,14 +55,16 @@ request or the files already answer, recommend an option whenever the user is un
   `tool.call`, `$.fs`, `$.process`, `$.http`…). No source → say so and offer what exists. Billing, quotas and
   account data are not assumed to exist.
 - **Every control works.** No button, tab, field or setting without a real, tested effect. No demo screens.
-- **Guards fail closed** (`.catch` that refuses); observers fail open (no `.catch`).
+- **Guards fail closed** (`.catch` that refuses); observers fail open (no `.catch`); approvers (`tool.check` allow)
+  fall back to the native verdict (`next(e)` / `ask`), never to `deny`-everything and never to `allow`.
 - **Never weaken the user's safety silently.** Auto-approve, deny-rule overrides, prompt rewrites and hidden
   `$.prompt.submit` need the risk explained and an explicit yes. A mod's approval is not the user's consent.
 - **No secrets** in code, tests, logs, examples or URLs; use `userConfig` with `"sensitive": true`.
 - **Least capability.** Call only the `$` methods the feature needs; `claude plugin validate` lists them, and they go in the README.
 - **Honest verification.** Separate static checks, unit tests and a real session. Never claim a visual or
-  cross-surface result you did not run. Hooks run in VS Code, `claude -p`, SDK and cloud sessions; only the
-  terminal and the Desktop app draw (`references/surfaces.md`).
+  cross-surface result you did not run. Hooks run everywhere; drawing is guaranteed only in the terminal and the
+  Desktop app. The types declare a `vscode` surface while the docs say VS Code does not draw: give every drawn
+  view a text path (a command reply) and treat VS Code drawing as unverified (`references/surfaces.md`).
 - **Code lives where the user keeps code.** Develop in the session mods folder (hot reload); deliver to the
   user's projects folder (ask once if unknown) with a marketplace entry. Never delete the user's files.
 
@@ -66,8 +75,8 @@ Start from the closest example in `examples/` (rename `_claude-plugin` → `.cla
 | Example | Shows |
 |---|---|
 | `session-dashboard` | Pane with tabs, KPI cards, sparkline, Select filter, Input, store + `/clear` reload, command |
-| `context-band` | Band above the prompt from `$.session.usage()`, hide button, no-data fallback |
-| `shell-guard` | `tool.call` guard, `$.ui.ask` hold-and-confirm, `userConfig` mode, fail-closed `.catch`, pure rules module |
+| `context-band` | Band above the prompt from `$.session.usage()`, hide button + `/context-band` to show it again, no-data fallback |
+| `shell-guard` | Guard on every command tool (Bash, PowerShell, Monitor), `$.ui.ask` hold-and-confirm, `userConfig` mode (ask/block/off), fail-closed `.catch`, pure rules module, Windows paths |
 | `git-recap` | `/command` with `argumentHint`, argument validation, `$.process.run` argv, error paths |
 | `spinner-counter` | Restyling a native site (`Spinner`) with `next({ ...e, props })`, per-turn state |
 

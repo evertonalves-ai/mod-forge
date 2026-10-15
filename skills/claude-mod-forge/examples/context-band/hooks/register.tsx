@@ -46,7 +46,19 @@ export const register: Register = on => {
   on('session.start', async ($, e, next) => {
     const result = await next(e)
     await takeReading($)
+    try {
+      // The way back after "hide": every control needs an undo.
+      await $.command.register({ name: 'context-band', description: 'Show or hide the context band above the prompt', immediate: true })
+    } catch {
+      // Name taken: the band still works, only the toggle is missing.
+    }
     return result
+  })
+
+  on('command.run', { command: 'context-band' }, async $ => {
+    const hidden = await read($, isHidden)
+    await update($, isHidden, () => !hidden)
+    return { text: hidden ? 'Context band shown.' : 'Context band hidden. Run /context-band to show it again.' }
   })
 
   on('turn.complete', async ($, e, next) => {
@@ -73,7 +85,7 @@ export const register: Register = on => {
         <Text dimColor>{short(now.tokens)} / {short(now.window)}</Text>
         {isWide && list.length > 1 && <Text color="claude">{chart(list)}</Text>}
         {isWide && delta !== 0 && <Text dimColor>{delta > 0 ? `▲ +${short(delta)}` : `▼ ${short(-delta)}`} last turn</Text>}
-        <Button key="hide" label="hide" plain dimColor onPress={() => update($, isHidden, () => true)} />
+        <Button key="hide" label="hide (/context-band)" plain dimColor onPress={() => update($, isHidden, () => true)} />
       </Box>
     )
   })

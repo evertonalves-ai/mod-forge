@@ -80,3 +80,38 @@ A timer callback that throws is logged and runs again next interval. Long work i
 Hook: 10 s own time (waits inside `$` calls and `next` don't count, `$.clock.sleep` does). `.catch`: 1 s.
 `session.end` hooks together: 1.5 s. Redraws: ≤ 10/s (30/s in terminal for the visible pane/band).
 Toast: 4 s default. Names: `[A-Za-z0-9_-]{1,64}`. Tree text: first 100,000 chars drawn. Test: 5 s each.
+
+## Facts that change designs (verified against types, docs or validate)
+- **Limits come from different sources.** Hook budgets, `$.fs` 4 MiB, `$.store` 4 MiB and the `$.process` 30 s
+  default are in the types. The `$.http.fetch` limits (30 s total, 4 MiB bodies, ≤ 5 redirects, cross-origin
+  redirects drop `Authorization`) come from the docs' reference/api pages, not the types: label them that way.
+- **`$.fs` has no append and no delete** (`read write list exists stat ancestors`). A log needs read-modify-write,
+  serialised through one promise chain (parallel tool calls race), size rolling under 4 MiB, and manual cleanup
+  documented in the README.
+- **No home-directory API.** A `~` default needs `$.env.get('HOME')` / `$.env.get('USERPROFILE')` (literal names),
+  which shows up in validate as `env reads:` — prefer a `userConfig` field of type `directory`.
+- **Context data:** `$.session.usage()` is free; `usage({ breakdown: 'summary' })` adds a local per-category
+  estimate; `breakdown: 'full'` sends extra token-count requests (costly: only on a user action).
+  The **`session.measure`** event fires after each main-thread turn and when a plan limit's percent changes
+  (`e.context`, `e.rateLimits`, `e.cost?`, `e.changed`): prefer it to polling.
+- **`$.prompt.submit({ text })`** is queued until Claude is idle and resolves when that turn starts. Claude reads
+  it framed as sent by the mod; `asUser: true` removes the framing (explicit yes needed). Use `$.prompt.fill` to
+  draft into the composer instead of sending.
+- **Command names collide with built-ins** (`/context`, `/cost`, `/plugin`, `/config`, `/diff`, …): pick a
+  distinctive name (`/context-dash`) and wrap `$.command.register` in try/catch.
+- **Helpers that take `$`** must be top-level functions in the same file (validate reports `(via helper)`);
+  passing `$` to a method, an inner function or an imported function fails validation.
+
+## userConfig (verified with `claude plugin validate`)
+```json
+"userConfig": {
+  "mode":   { "type": "string", "title": "Mode", "description": "…", "options": ["ask", "block", "off"], "default": "ask" },
+  "outDir": { "type": "directory", "title": "Export folder", "description": "…" },
+  "token":  { "type": "string", "title": "API token", "description": "…", "sensitive": true }
+}
+```
+- Types: `string`, `number`, `boolean`, `directory`, `file`. **No array**: take lists as a comma-separated string.
+- `title` is required. `options` on a string makes a picker; a stored value outside it counts as unset.
+- `sensitive: true` stores the value in secure storage, masked in the dialog.
+- Values reach `register(on, options)`; tests pass them with `test(name, { options: {…} }, body)`.
+- For `--plugin-dir` mods values live in user settings `pluginConfigs["<name>@inline"].options`.

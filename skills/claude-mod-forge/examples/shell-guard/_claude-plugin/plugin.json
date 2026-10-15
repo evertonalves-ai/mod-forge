@@ -1,14 +1,20 @@
 {
   "name": "shell-guard",
   "version": "0.1.0",
-  "description": "Holds risky shell commands for the user's decision and blocks edits to secret files; fails closed",
-  "author": { "name": "mod-forge example" },
+  "description": "Holds risky shell and PowerShell commands for the user's decision and blocks edits to secret files; fails closed",
+  "author": {
+    "name": "mod-forge example"
+  },
   "userConfig": {
     "mode": {
       "type": "string",
       "title": "Risky command mode",
-      "description": "ask: hold the command and ask the user. block: refuse it outright.",
-      "options": ["ask", "block"],
+      "description": "ask: hold the command and ask. block: refuse it outright. off: guard disabled.",
+      "options": [
+        "ask",
+        "block",
+        "off"
+      ],
       "default": "ask"
     }
   }

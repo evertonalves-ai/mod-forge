@@ -21,6 +21,12 @@ claude plugin install my-mod@my-mods
 ```
 A folder marketplace with relative sources is read in place: edit the folder, run `/reload-plugins`, no reinstall.
 
+## Skills folder (also loads a mod)
+A plugin folder placed at `~/.claude/skills/<name>/` (user) or `<project>/.claude/skills/<name>/` (project) is
+auto-loaded as `<name>@skills-dir` and hot-reloads on save in interactive sessions. Simple, but it mixes code
+into a config folder; prefer a junction/symlink to the real project folder. Organisations with a marketplace
+allow-list must include `skills-dir` for this to load.
+
 ## Git repository (team / public)
 One repo can be both the plugin and its marketplace (`"source": "./"`), or hold many plugins.
 ```bash

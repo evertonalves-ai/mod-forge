@@ -48,3 +48,23 @@ test('no reading means no band: it never invents a number', async ($, on) => {
   expect(await ui.find({ key: 'engine' })).toBeDefined()
   expect(await ui.find({ text: /%/ })).toBeUndefined()
 })
+
+test('/context-band brings the band back after hide', async ($, on) => {
+  on('session.usage', () => usage(50_000))
+  on('turn.complete', () => ({ text: '' }))
+  on('ui.render', { component: 'AbovePrompt' }, ($, e) => {
+    const { Box } = $.ui.resolve(e)
+    return <Box key="engine" />
+  })
+  await $.turn.complete({ turnId: 't1', answer: 'ok', durationMs: 10, isAborted: false, reason: 'answer' as const })
+  const typed = { args: '', origin: { kind: 'composer' }, presentation: { isFullscreen: true, columns: 120 } } as const
+
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  await ui.press({ key: 'hide' })
+  expect(await ui.find({ key: 'engine' })).toBeDefined()
+  const shown = await $.command.run({ command: 'context-band', ...typed })
+  expect(shown.text).toBe('Context band shown.')
+  expect(await ui.find({ text: /25%/ })).toBeDefined()
+  const hidden = await $.command.run({ command: 'context-band', ...typed })
+  expect(hidden.text).toMatch(/hidden/)
+})

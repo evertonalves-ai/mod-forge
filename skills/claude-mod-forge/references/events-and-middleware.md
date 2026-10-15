@@ -58,3 +58,19 @@ With `.catch(($, e, next) => next.called ? next(e) : refusal)`: fail closed.
 Refusals per event: `tool.call` `{ deny }`, `prompt.submit` `{ drop }`, `config.set` `{ deny }`,
 `tool.check` `{ decision: 'deny', reason }` (returnable even after `next`), `plugin.register` `{ refuse }`.
 `next.error.kind`: `throw` | `timeout` | `re-entry` (a call made beneath this hook's own `$` call).
+
+## Approvers are different from guards
+A `tool.check` hook that **approves** must fail to the native verdict, not to `deny` and never to `allow`:
+```ts
+on('tool.check', { tool: 'Bash' }, async ($, e, next) => {
+  const decided = await next(e)                       // what rules, mode and settings hooks decided
+  if (decided.decision !== 'ask') return decided      // never turn a deny into allow
+  return isOnAllowList(e.input.command) ? { decision: 'allow', reason: 'scoped allow-list' } : decided
+}).catch(($, e, next) => next(e))                     // failure → the engine's own verdict
+```
+- An `allow` does not dismiss tools that need the person (questions, plan approval): "approve everything" is
+  impossible by design, and the native permission modes (`acceptEdits`, `bypassPermissions`) or permission
+  rules are the right tool for broad approval — recommend them before writing a mod.
+- Only approve when `next(e)` said `ask`; reject compound shell commands (`;`, `&&`, `|`, `$(`, backticks,
+  redirections) from allow-lists so `git status && rm -rf x` cannot ride along.
+- Deny rules hold over user mods where the built-in guard loads (docs, admin page); do not rely on that in code.

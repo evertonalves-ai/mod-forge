@@ -5,7 +5,8 @@ Goal: enough facts to fill `templates/project-spec.md`, with as few questions as
 ## Rules
 1. **Extract before asking.** Parse the request into the spec fields first. A field the request answers is
    never asked. A field the files, repo or `.d.ts` can answer is looked up, not asked.
-2. **Max 3 questions per round**, with AskUserQuestion, options written in the user's words (no API jargon),
+2. **Max 3 questions per round**, with AskUserQuestion (if that tool is unavailable, ask the same questions as
+   a short numbered list in chat, options lettered, recommendation marked), options written in the user's words (no API jargon),
    the recommended option first and marked "(Recommended)". "Other" is always available.
 3. **Most design-changing question first.** Order: what problem → where it shows → observe or change →
    the rest. Stop when the spec can be filled.
@@ -17,7 +18,7 @@ Goal: enough facts to fill `templates/project-spec.md`, with as few questions as
    - *change*: the mod edits the event before it continues (Claude sees the edited version);
    - *take over*: the mod answers itself and Claude Code's own behaviour does not run (blocking lives here).
 6. **"You decide"** → pick defaults from the table at the end, write them as assumptions in the spec.
-7. **Safety questions are never skipped** when the mod blocks, approves, rewrites, runs processes, reaches the
+7. **Safety questions are never skipped** (they may take their own round; the 3-question cap is per round) when the mod blocks, approves, rewrites, runs processes, reaches the
    network, writes files or touches secrets (section E).
 8. **Typical totals:** small mod 0–1 rounds, medium 1–2, large 2–3. More than 3 rounds means the request should
    be split into phases.
@@ -73,7 +74,11 @@ distribute. Lower levels cut scope, never code quality: a prototype still valida
 
 ## Round templates
 **Round 1 (almost always):**
-1. "What should this help you with?" (only if the request does not say)
+1. "What should this help you with?" (only if the request does not say). Options from `idea-catalog.md`
+   closest to the request, e.g. "Show how this session is going (context, turns, tools) (Recommended)" ·
+   "Stop or ask before risky commands" · "A /command that does a job for me" · "Something else".
+   Round-1 option sets must fit the request: a logging mod asks "where should the log go" (file / pane /
+   transcript lines / debug log), not "where should it show".
 2. "Where should it show?" — band / side pane / when I type a command / no screen, just behaviour
 3. "Should it only watch, or also change or block things?" (only if behaviour is implied)
 

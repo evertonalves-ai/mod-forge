@@ -5,10 +5,12 @@ import { isSecretPath, riskOf } from './rules'
 // Every guard here fails CLOSED: if the hook throws or times out before deciding,
 // the .catch handler refuses. A guard without .catch would let the command through.
 export const register: Register = (on, options) => {
-  const mode = options.mode === 'block' ? 'block' : 'ask'
+  const mode = options.mode === 'block' || options.mode === 'off' ? options.mode : 'ask'
 
-  on('tool.call', { tool: 'Bash' }, async ($, e, next) => {
-    const risk = riskOf(e.command)
+  // One guard for every tool that runs a command. Monitor's command is optional.
+  on('tool.call', { tool: ['Bash', 'PowerShell', 'Monitor'] }, async ($, e, next) => {
+    if (mode === 'off') return next(e)
+    const risk = riskOf(String(e.command ?? ''))
     if (risk === undefined) return next(e)
 
     if (mode === 'block') {
@@ -20,7 +22,7 @@ export const register: Register = (on, options) => {
     let answer = 'Refuse'
     try {
       // The wait happens inside a $ call, so it does not count against the hook's time limit.
-      answer = await $.ui.ask(`${risk.label} (${risk.why}). Run this command?\n\n${e.command.slice(0, 400)}`, ['Run it', 'Refuse'])
+      answer = await $.ui.ask(`${risk.label} (${risk.why}). Run this command?\n\n${String(e.command ?? '').slice(0, 400)}`, ['Run it', 'Refuse'])
     } catch {
       // Nobody could answer.
     }
@@ -32,7 +34,7 @@ export const register: Register = (on, options) => {
   }).catch(($, e, next) => (next.called ? next(e) : { deny: `${$.plugin.name}: the check failed, so the command was not run.` }))
 
   on('tool.call', { tool: ['Edit', 'Write'] }, ($, e, next) =>
-    isSecretPath(e.file_path)
+    mode !== 'off' && isSecretPath(e.file_path)
       ? { deny: `${$.plugin.name}: ${e.file_path} holds secrets and is not edited by Claude here.` }
       : next(e),
   ).catch(($, e, next) => (next.called ? next(e) : { deny: `${$.plugin.name}: the check failed, so the edit was not made.` }))

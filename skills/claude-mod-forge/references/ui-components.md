@@ -12,8 +12,18 @@ A tree that does not validate is dropped and the engine draws its own (a dim lin
 |---|---|---|
 | `Pane` (`requestId` = your id) | rich, persistent UI; width `e.props.bodyColumns`, height `e.props.scroll.bodyRows` | terminal, desktop |
 | `AbovePrompt` | one shared band above the prompt; return `next(e)` when idle; respect `e.props.hasSurvey` | terminal, desktop |
-| `Spinner`, `UserMessage`, `AssistantMessage`, `ToolUse`, `ToolResult`, `ToolGroup`, `CommandOutput`, `AskUserQuestion`, `SessionMode`, `PromptHint` | restyle native UI | terminal, desktop |
+| `UserMessage`, `AssistantMessage`, `ToolUse`, `ToolResult`, `ToolGroup`, `CommandOutput`, `AskUserQuestion` | restyle native UI | every surface (types) |
+| `Spinner`, `SessionMode`, `PromptHint` | restyle native UI | terminal, desktop |
 | `ToolProgress`, `TurnDuration`, `InfoNotice` | restyle native UI | terminal only |
+Raised-where follows the 2.1.293 types; see `surfaces.md` for the VS Code disagreement with the docs.
+
+### "Put it above / below the prompt" — which place is meant
+| The user says | Candidates (ask which, with these words) |
+|---|---|
+| "above the prompt" | the **band** (`AbovePrompt`, empty unless a mod draws, shared, has the engine's own `[-]` collapse / ctrl+x ctrl+a) · the **spinner line** while Claude works (`Spinner`) · notices under the logo (`InfoNotice`, terminal only) |
+| "under the prompt" / "status line" | `$.ui.status(text)` (one pinned line **under** the prompt, prefixed with the mod name) · the hint line (`PromptHint`) |
+| "a popup / notification" | `$.ui.toast` (4 s, top right in fullscreen, under the prompt in classic) |
+| "in the chat" | `$.ui.log` (dim transcript line Claude does not read) or a `/command` reply (Claude reads it) |
 Not a site: the permission prompt.
 
 ## Elements
@@ -68,6 +78,13 @@ columns; KPI cards `flexGrow={1}` inside `flexWrap="wrap"`; long text `wrap="tru
 
 **States every view needs:** empty (says what will appear), loading (`◌ loading…` in `warning`), error (`✗` + short
 reason in `error` + a retry button `r`), and a no-data fallback that never shows an invented number.
+
+**Hide needs a way back.** A "hide" button must be paired with a command (or a hotkey on another site) that
+shows the view again; otherwise the control breaks the "every control works" rule after one press.
+The engine's own band collapse (`[-]`, ctrl+x ctrl+a) is reversible and needs no code.
+
+**Button count.** Hotkeys are one digit or one lowercase letter: at most 9 numbered actions per view. More
+actions go to a second tab, a `Select`, or Tab/arrow navigation.
 
 **Interaction:** every control has a stable `key` (`tab-<id>`, `del-<id>`, `act-<id>`); one primary action;
 destructive per-row actions are small `plain` `×` buttons; confirmations of done actions are short toasts;

@@ -11,3 +11,9 @@ Never restart the interview. Rebuild the context from files.
    change was, and what fails now. Then propose the next step.
 5. Ask only what the files cannot answer. Continue in improve or debug mode.
 6. If no spec exists, write `MOD-SPEC.md` from what the code does (mark it "reconstructed") before changing anything.
+
+## Conflicts and location
+- `MOD-SPEC.md` vs `DECISIONS.md`: the newer dated entry wins; mention the conflict in the status message and
+  reconcile it in the plan (e.g. a `userConfig` default that satisfies both).
+- Status message and the next interview round can go in one message; do not change code before the answers.
+- Mod outside the projects folder and dev-mods: edit in place, load with `--plugin-dir`, and offer once to move it.

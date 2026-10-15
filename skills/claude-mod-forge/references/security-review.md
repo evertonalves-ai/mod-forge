@@ -43,3 +43,15 @@ logging; no personal data in URLs or query strings; encrypt at rest when it leav
 
 ## Output
 Fill `templates/security-review.md`. List the capabilities in the README's "What this mod can reach" section.
+
+## Path containment for writes (including files that do not exist yet)
+```ts
+async function insideProject($: EngineInterface, relDir: string): Promise<string | undefined> {
+  if (relDir.includes('..') || /^([a-zA-Z]:|[\\/])/.test(relDir)) return undefined   // relative only
+  const root = (await $.fs.stat('.', { resolve: true })).realPath
+  const probe = (await $.fs.exists(relDir)) ? relDir : '.'              // resolve the parent when new
+  const real = (await $.fs.stat(probe, { resolve: true })).realPath
+  return real && root && real.startsWith(root) ? relDir : undefined
+}
+```
+Grep `stat:` in the `.d.ts` for the exact `realPath` result shape of your build before using this.
