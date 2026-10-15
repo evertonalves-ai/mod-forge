@@ -1,0 +1,7 @@
+{
+  "name": "spinner-counter",
+  "version": "0.1.0",
+  "description": "Customises Claude Code's own spinner: adds the tool calls of the current turn after its word, keeping the native animation",
+  "author": { "name": "mod-forge example" },
+  "types": "./types/index.d.ts"
+}

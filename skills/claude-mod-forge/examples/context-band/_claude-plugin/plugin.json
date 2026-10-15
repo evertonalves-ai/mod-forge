@@ -1,0 +1,7 @@
+{
+  "name": "context-band",
+  "version": "0.1.0",
+  "description": "Band above the prompt with real context-window use from $.session.usage(), a trend of recent turns and a hide button",
+  "author": { "name": "mod-forge example" },
+  "types": "./types/index.d.ts"
+}

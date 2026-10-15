@@ -1,0 +1,14 @@
+{
+  "name": "mod-forge",
+  "owner": {
+    "name": "Everton Alves"
+  },
+  "description": "claude-mod-forge: a skill that builds, debugs, audits and packages Claude Code mods",
+  "plugins": [
+    {
+      "name": "mod-forge",
+      "source": "./",
+      "description": "Skill that builds, debugs, audits and packages Claude Code mods"
+    }
+  ]
+}

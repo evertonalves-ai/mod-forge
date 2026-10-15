@@ -1,0 +1,6 @@
+{
+  "name": "git-recap",
+  "version": "0.1.0",
+  "description": "/recap [days]: lists your recent commits in this repository without starting a Claude turn",
+  "author": { "name": "mod-forge example" }
+}
