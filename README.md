@@ -1,5 +1,7 @@
 # claude-mod-forge
 
+[Resumo em português](README.pt-BR.md)
+
 A Claude Code skill that builds [mods](https://code.claude.com/docs/en/plugins/mods/overview) from a description.
 You say what you want ("a pane with my build status", "ask me before any force push", "show context use above
 the prompt"), answer a short interview, and get a mod with code, tests, docs and install steps. The skill checks
@@ -20,14 +22,14 @@ The skill inside it is `claude-mod-forge`.
 
 As a plugin, from this repository (at a Claude Code prompt in a terminal):
 ```
-/plugin install mod-forge@<owner>/claude-mod-forge
+/plugin install mod-forge@ReborNLtO/claude-mod-forge
 ```
 Accept the marketplace when asked, then pick a scope (user is the usual choice). The repository is private, so
 your GitHub account needs access to it.
 
 Or as a personal skill, from a clone:
 ```bash
-git clone https://github.com/<owner>/claude-mod-forge.git
+git clone https://github.com/ReborNLtO/claude-mod-forge.git
 # macOS / Linux
 ln -s "$PWD/claude-mod-forge/skills/claude-mod-forge" ~/.claude/skills/claude-mod-forge
 # Windows (PowerShell), a junction needs no admin rights
