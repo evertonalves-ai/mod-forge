@@ -1,0 +1,34 @@
+{
+  "name": "api-status",
+  "version": "0.1.0",
+  "description": "Band above the prompt with one value read from an HTTP API you configure; token kept in secure storage; offline state",
+  "author": { "name": "mod-forge example" },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "url": {
+      "type": "string",
+      "title": "Status URL",
+      "description": "https:// URL returning JSON (http:// only for localhost)",
+      "default": ""
+    },
+    "field": {
+      "type": "string",
+      "title": "JSON field",
+      "description": "Dotted path to the value to show, e.g. status or data.deploy.state",
+      "default": "status"
+    },
+    "token": {
+      "type": "string",
+      "title": "API token",
+      "description": "Optional. Sent as Authorization: Bearer. Stored in secure storage, never shown.",
+      "sensitive": true,
+      "default": ""
+    },
+    "refreshSeconds": {
+      "type": "number",
+      "title": "Refresh every (seconds)",
+      "description": "0 = only on demand (/api-status or r). Minimum 15.",
+      "default": 0
+    }
+  }
+}

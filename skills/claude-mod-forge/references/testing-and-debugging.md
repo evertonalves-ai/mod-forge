@@ -53,3 +53,14 @@ test('with options', { options: { mode: 'block' } }, async ($, on) => { … })  
 Hot reload sessions print dim lines naming the mod, event and reason. Otherwise `claude --debug-file ./mod.log`
 and search for the mod name. `/plugin` shows `N mods active`. `claude plugin test` in an empty folder tells
 whether mods can load at all. Full symptom table: `workflows/debug.md`.
+
+## More pitfalls (hit while building the second batch of examples)
+| Symptom | Fix |
+|---|---|
+| A Svg (or Input on mobile) silently missing from the tree | `'Svg' in ui` is true on every surface at run time: branch on `e.surface` (see ui-components.md) |
+| `find({ key })` cannot find a row | `Text` has no `key` prop (it is ignored): key the row's `Box` |
+| `prompt.submit: called from a command.run hook, it would wait on the turn this hook is holding` | schedule it: `$.clock.after(0, () => send($, …))`; in tests `await clock.settle()` |
+| A `$.fs` stub sees `C:\…` while the mod wrote `C:/…` | the engine hands paths over in the platform's absolute form: compare by suffix |
+| `on("ui.toast") registered twice` in a test | one stub per event (and matcher) per test: share it through the helper |
+| A stub for `$.http.fetch` needs to simulate "network down" | return `{ deny: '…' }` (the call rejects in the mod) |
+| Unsure what a hook drew | `console.log(JSON.stringify(await ui.drawn()))` inside the test |

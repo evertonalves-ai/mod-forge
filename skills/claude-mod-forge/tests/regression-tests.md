@@ -2,9 +2,9 @@
 
 ## For the skill
 Run after any change to the skill:
-1. `node scripts/check-mod.mjs examples/<name>` for all five examples → all green.
+1. `node scripts/check-mod.mjs examples/<name>` for every example → all green.
    ```bash
-   for m in session-dashboard context-band shell-guard git-recap spinner-counter; do node scripts/check-mod.mjs examples/$m || exit 1; done
+   for d in examples/*/; do m=$(basename $d); node scripts/check-mod.mjs examples/$m || exit 1; done
    ```
 2. `claude plugin validate <repo-root>` → passes (manifest + marketplace).
 3. Re-run any acceptance case whose reference file changed.

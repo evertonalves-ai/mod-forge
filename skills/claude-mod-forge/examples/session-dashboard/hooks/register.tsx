@@ -189,7 +189,7 @@ export const register: Register = on => {
       const shown = list.filter(a => currentFilter === 'all' || a.tool === currentFilter).slice(-rows)
       body = (
         <Box flexDirection="column" gap={1}>
-          {'Select' in ui && (
+          {e.surface !== 'mobile' && 'Select' in ui && (
             <ui.Select
               key="filter"
               label="Filter"
@@ -216,7 +216,7 @@ export const register: Register = on => {
     } else {
       body = (
         <Box flexDirection="column" gap={1}>
-          {'Input' in ui && (
+          {e.surface !== 'mobile' && 'Input' in ui && (
             <ui.Input
               key="new-note"
               label="New note"

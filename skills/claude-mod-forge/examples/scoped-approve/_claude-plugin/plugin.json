@@ -1,0 +1,21 @@
+{
+  "name": "scoped-approve",
+  "version": "0.1.0",
+  "description": "Approves without asking only the shell commands on an exact allow-list; never overrides a deny, never touches subagents",
+  "author": { "name": "mod-forge example" },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "allowList": {
+      "type": "string",
+      "title": "Allowed commands",
+      "description": "Comma-separated. Each entry matches the command exactly or followed by arguments, e.g. git status, npm test",
+      "default": ""
+    },
+    "enabled": {
+      "type": "boolean",
+      "title": "Enabled",
+      "description": "Turn the auto-approval off without uninstalling",
+      "default": true
+    }
+  }
+}

@@ -3,9 +3,19 @@
 ## Drawing in one paragraph
 A `ui.render` hook receives one site instance (`e.component`, `e.surface`, `e.requestId`, `e.props`,
 `e.viewport`) and returns a tree, `next({ ...e, props })` (engine draws with changed props), or `next(e)`.
-Elements come from `const ui = $.ui.resolve(e)`; destructure `Box`, `Text`, `Button` (everywhere) and test
-`'Input' in ui` / `'Select' in ui` / `'Raster' in ui` / `'Svg' in ui` before using the rest (`<ui.Input …/>`).
+Elements come from `const ui = $.ui.resolve(e)`; destructure `Box`, `Text`, `Button` (everywhere).
+For the rest, **decide by `e.surface`** and keep `'X' in ui` only to narrow the type:
+```tsx
+{e.surface !== 'mobile' && 'Input' in ui && <ui.Input … />}        // Input/Select: terminal, desktop, vscode
+{e.surface !== 'terminal' && 'Svg' in ui ? <ui.Svg … /> : <Text>…</Text>}   // Svg: desktop, mobile, vscode
+{e.surface === 'terminal' && 'Raster' in ui && <ui.Raster … />}    // Raster/Image: terminal only
+```
+Verified with the 2.1.293 kit: at run time every surface's table lists **every** element, so `'Svg' in ui`
+alone is true on the terminal, and the Svg is then dropped from the tree. Use the per-surface lists in
+`surfaces.md`.
+`TextProps` declares no `key` (a key on `Text` is ignored): to find or address a row from a test, key its `Box`.
 A tree that does not validate is dropped and the engine draws its own (a dim line says why under hot reload).
+To see what a hook really drew, print `JSON.stringify(await ui.drawn())` in a kit test.
 
 ## Sites
 | Site | Use | Draws on |

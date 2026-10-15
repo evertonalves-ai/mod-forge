@@ -1,5 +1,14 @@
 # Changelog
 
+## 0.2.0 — 2026-10-15
+- Five new reference mods (10 in total, 51 kit tests, all passing validate + strict tsc + `claude plugin test`):
+  `scoped-approve` (tool.check approver), `api-status` (http + sensitive token), `tool-log` (fs JSONL logging),
+  `prompt-buttons` (user buttons + `$.prompt.submit`), `context-chart` (session.measure + Svg on desktop).
+- Fixed a wrong recommendation: `'Input' in ui` / `'Svg' in ui` only narrow types; at run time every surface's
+  element table lists every element. The skill and the examples now pick optional elements by `e.surface`.
+- New verified rules: `$.prompt.submit` is refused inside a `command.run` hook (schedule it with
+  `$.clock.after(0, …)`); `$.fs` paths reach stubs in the platform's absolute form; one stub per event per test.
+
 ## 0.1.0 — 2026-10-14
 - First version of the `claude-mod-forge` skill, packaged as the `mod-forge` plugin.
 - Modes: create, plan, continue, debug, improve, audit, test, package.

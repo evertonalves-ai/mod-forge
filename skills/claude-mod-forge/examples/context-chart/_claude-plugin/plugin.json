@@ -1,0 +1,7 @@
+{
+  "name": "context-chart",
+  "version": "0.1.0",
+  "description": "/context-chart pane: context-window use per turn as an SVG line chart in the desktop app and text bars in the terminal, pushed by session.measure (no polling)",
+  "author": { "name": "mod-forge example" },
+  "types": "./types/index.d.ts"
+}

@@ -25,7 +25,8 @@ Button, Input, Select, Svg, Link, Code, Markdown; no Client), and the test kit m
 | terminal only | `ToolProgress`, `TurnDuration`, `InfoNotice` |
 
 `$.session.surfaces()` answers which surfaces the session draws on right now (empty under `claude -p`).
-Narrow elements with `'Input' in ui` etc. instead of assuming a table.
+Pick optional elements by `e.surface` (the run-time element table lists every element on every surface;
+`'Input' in ui` only narrows the type). See `ui-components.md`.
 
 ## Design rule
 1. **Behaviour** (guards, rewrites, commands, timers, tools) runs on every surface: test it once with the kit.

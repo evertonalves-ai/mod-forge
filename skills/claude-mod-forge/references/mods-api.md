@@ -97,6 +97,8 @@ Toast: 4 s default. Names: `[A-Za-z0-9_-]{1,64}`. Tree text: first 100,000 chars
 - **`$.prompt.submit({ text })`** is queued until Claude is idle and resolves when that turn starts. Claude reads
   it framed as sent by the mod; `asUser: true` removes the framing (explicit yes needed). Use `$.prompt.fill` to
   draft into the composer instead of sending.
+  It is refused when called from a `command.run` hook (it would wait on the turn that hook holds): schedule it
+  with `$.clock.after(0, …)`. Never `await` it inside a handler. See `examples/prompt-buttons`.
 - **Command names collide with built-ins** (`/context`, `/cost`, `/plugin`, `/config`, `/diff`, …): pick a
   distinctive name (`/context-dash`) and wrap `$.command.register` in try/catch.
 - **Helpers that take `$`** must be top-level functions in the same file (validate reports `(via helper)`);

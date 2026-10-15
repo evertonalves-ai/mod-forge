@@ -1,4 +1,4 @@
-# Test results — v0.1.0 (2026-10-14)
+# Test results — v0.1.0 (2026-10-14), examples updated in v0.2.0 (2026-10-15)
 
 Environment: Windows 10, Claude Code CLI 2.1.294, mods API types 2.1.293, Node 24, TypeScript 5.6.3 (npx).
 
@@ -10,6 +10,11 @@ Environment: Windows 10, Claude Code CLI 2.1.294, mods API types 2.1.293, Node 2
 | shell-guard | pass | pass | 8/8 |
 | git-recap | pass | pass | 6/6 |
 | spinner-counter | pass | pass | 1/1 |
+| scoped-approve (0.2.0) | pass | pass | 7/7 |
+| api-status (0.2.0) | pass | pass | 6/6 |
+| tool-log (0.2.0) | pass | pass | 6/6 |
+| prompt-buttons (0.2.0) | pass | pass | 6/6 |
+| context-chart (0.2.0) | pass | pass | 4/4 |
 | plugin `mod-forge` manifest + marketplace | pass | — | — |
 
 Kit tests mount drawings on the `terminal` and `desktop` surfaces. **Not run:** painting in a real terminal or
@@ -57,6 +62,6 @@ regression (section 1), not by re-running the ten agents.
 
 ## 4. Reproduce
 ```bash
-for m in session-dashboard context-band shell-guard git-recap spinner-counter; do node scripts/check-mod.mjs examples/$m || exit 1; done
+for d in examples/*/; do m=$(basename $d); node scripts/check-mod.mjs examples/$m || exit 1; done
 claude plugin validate ../..
 ```

@@ -1,0 +1,20 @@
+{
+  "name": "tool-log",
+  "version": "0.1.0",
+  "description": "Writes one redacted JSON line per tool call to a per-session file in a folder you choose; rolls files, never logs file contents or results",
+  "author": { "name": "mod-forge example" },
+  "userConfig": {
+    "logDir": {
+      "type": "directory",
+      "title": "Log folder",
+      "description": "Where the .jsonl files go. Pick a folder outside your projects so logs are never committed.",
+      "default": ""
+    },
+    "enabled": {
+      "type": "boolean",
+      "title": "Enabled",
+      "description": "Pause logging without uninstalling",
+      "default": true
+    }
+  }
+}

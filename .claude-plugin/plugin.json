@@ -1,8 +1,16 @@
 {
   "name": "mod-forge",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "The claude-mod-forge skill: turns a plain-language idea into a tested Claude Code mod (interview, spec, code, checks, packaging)",
-  "author": { "name": "Everton Alves" },
+  "author": {
+    "name": "Everton Alves"
+  },
   "license": "MIT",
-  "keywords": ["mods", "plugins", "function-hooks", "skill", "dashboard"]
+  "keywords": [
+    "mods",
+    "plugins",
+    "function-hooks",
+    "skill",
+    "dashboard"
+  ]
 }
