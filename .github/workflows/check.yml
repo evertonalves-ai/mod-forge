@@ -10,11 +10,14 @@ permissions:
 jobs:
   examples:
     runs-on: ubuntu-latest
-    env:
-      # An empty config dir: validate and the test kit need no login.
-      CLAUDE_CONFIG_DIR: ${{ runner.temp }}/claude-config
-      TYPES: ${{ runner.temp }}/claude-code.d.ts
     steps:
+      # The runner context is not available in job-level env, so the paths are set here.
+      # An empty config dir: validate and the test kit need no login.
+      - name: Paths
+        run: |
+          echo "CLAUDE_CONFIG_DIR=$RUNNER_TEMP/claude-config" >> "$GITHUB_ENV"
+          echo "TYPES=$RUNNER_TEMP/claude-code.d.ts" >> "$GITHUB_ENV"
+
       - uses: actions/checkout@v4
 
       - uses: actions/setup-node@v4
