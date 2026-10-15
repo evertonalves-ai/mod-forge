@@ -1,0 +1,56 @@
+{
+  "name": "ideia",
+  "version": "0.1.0",
+  "description": "/ideia: two thinkers with different lines of thought and methods refine your idea by dialogue, you steer with comments, and the result is one Markdown document",
+  "author": {
+    "name": "mod-forge example"
+  },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "folder": {
+      "type": "directory",
+      "title": "Conversations folder",
+      "description": "Where each conversation gets its own subfolder with dialogue.jsonl and ideia.md",
+      "default": ""
+    },
+    "rounds": {
+      "type": "number",
+      "title": "Round limit",
+      "description": "Most rounds per conversation, 1 to 8. Each round is three messages.",
+      "default": 4
+    },
+    "pause": {
+      "type": "boolean",
+      "title": "Pause after each round",
+      "description": "Stop at the end of each round to show a summary and wait for you",
+      "default": true
+    },
+    "model": {
+      "type": "string",
+      "title": "Thinkers' model",
+      "description": "Model the two sides think with",
+      "options": [
+        "sonnet",
+        "opus",
+        "haiku"
+      ],
+      "default": "sonnet"
+    },
+    "obsidian": {
+      "type": "boolean",
+      "title": "Obsidian format",
+      "description": "Add frontmatter (date, description, tags) to the final document",
+      "default": false
+    },
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Language of the text this mod shows and the thinkers write in: en (English) or pt-BR (Português do Brasil)",
+      "options": [
+        "en",
+        "pt-BR"
+      ],
+      "default": "en"
+    }
+  }
+}
