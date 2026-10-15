@@ -2,7 +2,9 @@
   "name": "api-status",
   "version": "0.1.0",
   "description": "Band above the prompt with one value read from an HTTP API you configure; token kept in secure storage; offline state",
-  "author": { "name": "mod-forge example" },
+  "author": {
+    "name": "mod-forge example"
+  },
   "types": "./types/index.d.ts",
   "userConfig": {
     "url": {
@@ -29,6 +31,16 @@
       "title": "Refresh every (seconds)",
       "description": "0 = only on demand (/api-status or r). Minimum 15.",
       "default": 0
+    },
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Language of the text this mod shows: en (English) or pt-BR (Português do Brasil)",
+      "options": [
+        "en",
+        "pt-BR"
+      ],
+      "default": "en"
     }
   }
 }

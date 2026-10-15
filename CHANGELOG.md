@@ -1,5 +1,13 @@
 # Changelog
 
+## 0.4.0 — 2026-10-15
+- Two new reference mods (12 in total, 85 kit tests): `agent-board` (/agents: live status of this session's
+  agents) and `agent-dialogue` (/dialogue: a conversation agents write to a shared JSONL file).
+- `scripts/say.mjs`: posts to and reads that dialogue (`--file` or `MOD_DIALOGUE_FILE`); audit.md describes a
+  critic + builder review round watched live with the two mods.
+- Language option (`en` default, `pt-BR`) in the 8 examples with on-screen text, through a pure `hooks/i18n.ts`;
+  pattern documented in ui-components.md. Commands, keys and text Claude reads stay unchanged.
+
 ## 0.3.0 — 2026-10-15
 - Two-agent review (critic + builder, see tests/RESULTS.md §5): 10 findings, all closed; 69 kit tests (was 51).
 - Security: the write-containment recipe now follows the d.ts placed() pattern (no symlinked-parent or

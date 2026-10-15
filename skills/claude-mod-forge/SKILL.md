@@ -84,6 +84,11 @@ Start from the closest example in `examples/` (rename `_claude-plugin` → `.cla
 | `tool-log` | Observer writing redacted JSONL with `$.fs` (no append: serialised read-modify-write, file rolling by bytes, flush per turn), best-effort regex redaction, `directory` userConfig |
 | `prompt-buttons` | User-defined buttons in `$.store` (one key each), `$.prompt.submit` scheduled out of `command.run`, busy state, text path for VS Code |
 | `context-chart` | Data pushed by `session.measure`; one data layer, two renderings: `Svg` on desktop, text bars on the terminal, picked by `e.surface` |
+| `agent-board` | `/agents` pane of this session's subagents from `$.agent.list()` polled every 2 s, status labels, text fallback |
+| `agent-dialogue` | `/dialogue` pane that tails a JSONL file agents append to (`scripts/say.mjs`), tolerant parser, author `Select`, `file` userConfig with no default path |
+
+Every example with visible text takes a `language` option (`en` default, `pt-BR`) through `hooks/i18n.ts`;
+see "Language option" in `references/ui-components.md`.
 
 Then run the checker (validate + strict tsc + `claude plugin test`) until it is green:
 

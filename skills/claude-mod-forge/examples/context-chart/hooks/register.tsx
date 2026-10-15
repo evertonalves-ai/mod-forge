@@ -3,11 +3,14 @@ import type { Register } from 'claude-code'
 
 import type { Point } from '../types'
 import { HISTORY, short, svgChart, textBars } from './chart'
+import { strings } from './i18n'
 
 const PANE = 'context-chart'
 const points = atom({ plugin: 'context-chart', key: 'points' } as const, [])
 
-export const register: Register = on => {
+export const register: Register = (on, options) => {
+  const t = strings(options.language)
+
   // Pushed after each main-thread turn: no timer, no polling. Readings without tokens
   // (before the first reply, right after a compaction) are skipped, never drawn as 0.
   on('session.measure', async ($, e, next) => {
@@ -21,7 +24,7 @@ export const register: Register = on => {
 
   on('session.start', async ($, e, next) => {
     try {
-      await $.command.register({ name: 'context-chart', description: 'Chart context-window use per turn', immediate: true })
+      await $.command.register({ name: 'context-chart', description: t.commandDescription, immediate: true })
     } catch {
       // name taken
     }
@@ -29,10 +32,10 @@ export const register: Register = on => {
   })
 
   on('command.run', { command: 'context-chart' }, async $ => {
-    const opened = await $.ui.open({ id: PANE, title: 'Context chart', focus: true, closeOnEscape: true })
+    const opened = await $.ui.open({ id: PANE, title: t.paneTitle, focus: true, closeOnEscape: true })
     if (opened.isPlaced) return {}
     const list = await read($, points)
-    return { text: list.length === 0 ? 'No reading yet: the chart starts after Claude’s first reply.' : textBars(list, 60).join('\n') }
+    return { text: list.length === 0 ? t.noReading : textBars(list, 60).join('\n') }
   })
 
   on('ui.render', { component: 'Pane', requestId: PANE }, async ($, e) => {
@@ -43,12 +46,12 @@ export const register: Register = on => {
 
     let chart
     if (now === undefined) {
-      chart = <Text dimColor>No reading yet: the chart starts after Claude’s first reply.</Text>
+      chart = <Text dimColor>{t.noReading}</Text>
     } else if (e.surface !== 'terminal' && 'Svg' in ui) {
       // Decide by e.surface: at run time every surface's table lists every element, so
       // `'Svg' in ui` alone is true on the terminal too (it only narrows the type).
       const width = Math.max(120, e.props.bodyColumns * 8)
-      chart = <ui.Svg key="chart" source={svgChart(list, width, 120)} alt={`Context use over ${list.length} turns, now ${now.percent}%`} />
+      chart = <ui.Svg key="chart" source={svgChart(list, width, 120)} alt={t.alt(list.length, now.percent)} />
     } else {
       chart = <Text color="claude">{textBars(list, e.props.bodyColumns).join('\n')}</Text>
     }
@@ -56,7 +59,7 @@ export const register: Register = on => {
     return (
       <Box flexDirection="column" paddingX={1} gap={1}>
         <Box justifyContent="space-between">
-          <Text bold color="claude">◆ Context</Text>
+          <Text bold color="claude">{t.heading}</Text>
           {now !== undefined && (
             <Text color={now.percent < 75 ? 'success' : now.percent < 90 ? 'warning' : 'error'}>
               {`${now.percent}% · ${short(now.tokens)} / ${short(now.window)}`}
@@ -64,7 +67,7 @@ export const register: Register = on => {
           )}
         </Box>
         {chart}
-        <Text dimColor>one point per turn · dashed lines at 50% and 90% · Esc closes</Text>
+        <Text dimColor>{t.footer}</Text>
       </Box>
     )
   })

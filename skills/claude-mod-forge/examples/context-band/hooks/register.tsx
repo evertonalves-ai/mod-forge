@@ -2,6 +2,8 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { Reading } from '../types'
+import { strings } from './i18n'
+import type { Strings } from './i18n'
 
 // Data source: $.session.usage().context — the same figures the status line shows.
 // No estimate, no made-up number: when the call gives nothing, the band shows nothing.
@@ -11,11 +13,11 @@ const BARS = '▁▂▃▄▅▆▇█'
 const readings = atom({ plugin: 'context-band', key: 'readings' } as const, [])
 const isHidden = atom({ plugin: 'context-band', key: 'isHidden' } as const, false)
 
-function level(percent: number): { color: string; word: string } {
-  if (percent < 50) return { color: 'success', word: 'roomy' }
-  if (percent < 75) return { color: 'warning', word: 'filling' }
-  if (percent < 90) return { color: 'warning', word: 'tight' }
-  return { color: 'error', word: 'compact soon' }
+function level(percent: number, t: Strings): { color: string; word: string } {
+  if (percent < 50) return { color: 'success', word: t.roomy }
+  if (percent < 75) return { color: 'warning', word: t.filling }
+  if (percent < 90) return { color: 'warning', word: t.tight }
+  return { color: 'error', word: t.compactSoon }
 }
 
 function short(n: number): string {
@@ -42,13 +44,15 @@ async function takeReading($: EngineInterface) {
   }
 }
 
-export const register: Register = on => {
+export const register: Register = (on, options) => {
+  const t = strings(options.language)
+
   on('session.start', async ($, e, next) => {
     const result = await next(e)
     await takeReading($)
     try {
       // The way back after "hide": every control needs an undo.
-      await $.command.register({ name: 'context-band', description: 'Show or hide the context band above the prompt', immediate: true })
+      await $.command.register({ name: 'context-band', description: t.commandDescription, immediate: true })
     } catch {
       // Name taken: the band still works, only the toggle is missing.
     }
@@ -58,7 +62,7 @@ export const register: Register = on => {
   on('command.run', { command: 'context-band' }, async $ => {
     const hidden = await read($, isHidden)
     await update($, isHidden, () => !hidden)
-    return { text: hidden ? 'Context band shown.' : 'Context band hidden. Run /context-band to show it again.' }
+    return { text: hidden ? t.shown : t.hidden }
   })
 
   on('turn.complete', async ($, e, next) => {
@@ -73,7 +77,7 @@ export const register: Register = on => {
     if (e.props.hasSurvey || now === undefined || (await read($, isHidden))) return next(e)
 
     const { Box, Button, Text } = $.ui.resolve(e)
-    const lv = level(now.percent)
+    const lv = level(now.percent, t)
     const prev = list[list.length - 2]
     const delta = prev === undefined ? 0 : now.tokens - prev.tokens
     const isWide = e.props.bodyColumns >= 70
@@ -81,11 +85,11 @@ export const register: Register = on => {
     return (
       <Box gap={1} paddingX={1}>
         <Text color={lv.color} bold>● {now.percent}%</Text>
-        <Text dimColor>context · {lv.word}</Text>
+        <Text dimColor>{t.context} · {lv.word}</Text>
         <Text dimColor>{short(now.tokens)} / {short(now.window)}</Text>
         {isWide && list.length > 1 && <Text color="claude">{chart(list)}</Text>}
-        {isWide && delta !== 0 && <Text dimColor>{delta > 0 ? `▲ +${short(delta)}` : `▼ ${short(-delta)}`} last turn</Text>}
-        <Button key="hide" label="hide (/context-band)" plain dimColor onPress={() => update($, isHidden, () => true)} />
+        {isWide && delta !== 0 && <Text dimColor>{delta > 0 ? `▲ +${short(delta)}` : `▼ ${short(-delta)}`} {t.lastTurn}</Text>}
+        <Button key="hide" label={t.hide} plain dimColor onPress={() => update($, isHidden, () => true)} />
       </Box>
     )
   })

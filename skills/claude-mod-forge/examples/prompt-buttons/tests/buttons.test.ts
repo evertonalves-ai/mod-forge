@@ -110,3 +110,15 @@ test('where nothing draws, /buttons lists them as text', async ($, on) => {
   const reply = await $.command.run({ command: 'buttons', args: '', ...TYPED })
   expect(reply.text).toBe('1. Run tests')
 })
+
+test('language pt-BR: pane, validation and /buttons replies are in Portuguese', { options: { language: 'pt-BR' } }, async ($, on) => {
+  mock.clock(on, { now: 1_700_000_000_000 })
+  engine(on)
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ text: '◆ Botões de prompt' })).toBeDefined()
+  expect(await ui.find({ text: /Nenhum botão ainda/ })).toBeDefined()
+  await ui.input({ key: 'new-text', text: 'Run the linter' })
+  expect(await ui.find({ text: /Dê um nome ao botão primeiro/ })).toBeDefined()
+  const reply = await $.command.run({ command: 'buttons', args: 'x', ...TYPED })
+  expect(reply.text).toBe('Uso: /buttons [1-9]')
+})

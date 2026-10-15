@@ -2,6 +2,20 @@
   "name": "session-dashboard",
   "version": "0.1.0",
   "description": "Session dashboard pane: KPIs, tool activity with a filter, turn durations and notes kept across sessions",
-  "author": { "name": "mod-forge example" },
-  "types": "./types/index.d.ts"
+  "author": {
+    "name": "mod-forge example"
+  },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Language of the text this mod shows: en (English) or pt-BR (Português do Brasil)",
+      "options": [
+        "en",
+        "pt-BR"
+      ],
+      "default": "en"
+    }
+  }
 }

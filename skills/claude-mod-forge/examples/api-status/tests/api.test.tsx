@@ -112,3 +112,20 @@ test('hide, then /api-status brings the band back', CONFIG, async ($, on) => {
   await $.command.run({ command: 'api-status', args: '', ...TYPED })
   expect(await ui.find({ text: 'green' })).toBeDefined()
 })
+
+test('language pt-BR: band and /api-status reply are in Portuguese', { options: { ...CONFIG.options, language: 'pt-BR' } }, async ($, on) => {
+  mock.clock(on, { now: 1_700_000_000_000 })
+  http(on, ['down'])
+  const answer = await $.command.run({ command: 'api-status', args: '', ...TYPED })
+  expect(answer.text).toBe('API indisponível: inacessível')
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  expect(await ui.find({ text: '✗ indisponível' })).toBeDefined()
+  expect(await ui.find({ key: 'refresh' })).toBeDefined()
+})
+
+test('language pt-BR: no URL configured says how to fix it in Portuguese', { options: { language: 'pt-BR' } }, async ($, on) => {
+  mock.clock(on)
+  http(on, [])
+  const answer = await $.command.run({ command: 'api-status', args: '', ...TYPED })
+  expect(answer.text).toMatch(/Nenhuma URL definida/)
+})

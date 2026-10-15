@@ -3,6 +3,8 @@ import type { EngineInterface, Register } from 'claude-code'
 
 import type { ApiReading } from '../types'
 import { checkUrl, clock, pickField } from './api'
+import { strings } from './i18n'
+import type { Strings } from './i18n'
 
 const reading = atom({ plugin: 'api-status', key: 'reading' } as const, { kind: 'loading' })
 const isHidden = atom({ plugin: 'api-status', key: 'isHidden' } as const, false)
@@ -10,8 +12,8 @@ const isHidden = atom({ plugin: 'api-status', key: 'isHidden' } as const, false)
 type Config = { url: string; field: string; token: string }
 
 // One request. Never throws; never puts the token in any text, log, toast or state.
-async function refresh($: EngineInterface, config: Config) {
-  const target = checkUrl(config.url)
+async function refresh($: EngineInterface, config: Config, t: Strings) {
+  const target = checkUrl(config.url, t)
   if ('error' in target) {
     await update($, reading, () => ({ kind: 'unconfigured', reason: target.error }) satisfies ApiReading)
     return
@@ -27,12 +29,12 @@ async function refresh($: EngineInterface, config: Config) {
     if (!response.ok) {
       next = { kind: 'error', reason: `HTTP ${response.status}`, at, ...last }
     } else {
-      const picked = pickField(response.text, config.field || 'status')
+      const picked = pickField(response.text, config.field || 'status', t)
       next = 'error' in picked ? { kind: 'error', reason: picked.error, at, ...last } : { kind: 'ok', value: picked.value, at }
     }
   } catch {
     // Network failure, timeout (30 s), or a policy that refuses fetch. The reason text is ours, not the error's.
-    next = { kind: 'error', reason: 'unreachable', at: await $.clock.now(), ...last }
+    next = { kind: 'error', reason: t.unreachable, at: await $.clock.now(), ...last }
   }
   await update($, reading, () => next)
 }
@@ -43,6 +45,7 @@ export const register: Register = (on, options) => {
     field: String(options.field ?? 'status'),
     token: String(options.token ?? ''),
   }
+  const t = strings(options.language)
   const seconds = Number(options.refreshSeconds ?? 0)
   const interval = seconds > 0 ? Math.max(15, seconds) * 1000 : 0 // never poll faster than every 15 s
 
@@ -50,25 +53,25 @@ export const register: Register = (on, options) => {
   // command, then let the first fetch run on its own (the band shows "loading" until it lands).
   on('session.start', async ($, e, next) => {
     try {
-      await $.command.register({ name: 'api-status', description: 'Refresh the API status band (and show it if hidden)', immediate: true })
+      await $.command.register({ name: 'api-status', description: t.commandDescription, immediate: true })
     } catch {
       // name taken: the band and its r button still work
     }
-    void refresh($, config).catch(() => undefined)
-    if (interval > 0) $.clock.every(interval, () => refresh($, config))
+    void refresh($, config, t).catch(() => undefined)
+    if (interval > 0) $.clock.every(interval, () => refresh($, config, t))
     return next(e)
   })
 
   on('command.run', { command: 'api-status' }, async $ => {
     await update($, isHidden, () => false)
-    await refresh($, config)
+    await refresh($, config, t)
     const now = await read($, reading)
     // The same information as text, for surfaces that draw nothing (VS Code chat, claude -p).
     const text =
-      now.kind === 'ok' ? `API: ${now.value} (at ${clock(now.at)})`
-      : now.kind === 'error' ? `API unavailable: ${now.reason}${now.lastValue === undefined ? '' : ` · last ${now.lastValue}`}`
+      now.kind === 'ok' ? t.textOk(now.value, clock(now.at))
+      : now.kind === 'error' ? `${t.textError(now.reason)}${now.lastValue === undefined ? '' : t.textLast(now.lastValue)}`
       : now.kind === 'unconfigured' ? now.reason
-      : 'Loading…'
+      : t.loadingText
     return { text }
   })
 
@@ -86,28 +89,28 @@ export const register: Register = (on, options) => {
       status =
         now.lastValue === undefined ? (
           <>
-            <Text color="error">✗ unavailable</Text>
+            <Text color="error">{t.unavailable}</Text>
             <Text dimColor>{now.reason}</Text>
           </>
         ) : (
           <>
-            <Text color="error">✗ unavailable</Text>
+            <Text color="error">{t.unavailable}</Text>
             <Text dimColor>{now.reason}</Text>
-            <Text dimColor>· last {now.lastValue}{now.lastAt === undefined ? '' : ` at ${clock(now.lastAt)}`}</Text>
+            <Text dimColor>{t.last} {now.lastValue}{now.lastAt === undefined ? '' : ` ${t.at} ${clock(now.lastAt)}`}</Text>
           </>
         )
     } else if (now.kind === 'unconfigured') {
       status = <Text color="warning">{now.reason}</Text>
     } else {
-      status = <Text color="warning">◌ loading…</Text>
+      status = <Text color="warning">{t.loading}</Text>
     }
 
     return (
       <Box gap={1} paddingX={1}>
         <Text dimColor>API</Text>
         {status}
-        <Button key="refresh" label="refresh" hotkey="r" plain dimColor onPress={() => refresh($, config)} />
-        <Button key="hide" label="hide (/api-status)" plain dimColor onPress={() => update($, isHidden, () => true)} />
+        <Button key="refresh" label={t.refresh} hotkey="r" plain dimColor onPress={() => refresh($, config, t)} />
+        <Button key="hide" label={t.hide} plain dimColor onPress={() => update($, isHidden, () => true)} />
       </Box>
     )
   })

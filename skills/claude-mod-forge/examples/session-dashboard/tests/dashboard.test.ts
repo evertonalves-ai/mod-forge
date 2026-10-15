@@ -83,3 +83,12 @@ test('/dashboard opens the pane and prints nothing', async ($, on) => {
   expect(opened).toEqual(['session-dashboard'])
   expect(answer).toEqual({})
 })
+
+test('language pt-BR: title, cards and tabs are in Portuguese', { options: { language: 'pt-BR' } }, async ($, on) => {
+  mock.clock(on)
+  const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  expect(await ui.find({ text: /Painel da sessão/ })).toBeDefined()
+  expect(await ui.find({ text: 'Ferramentas' })).toBeDefined()
+  await ui.press({ key: 'tab-notes' })
+  expect(await ui.find({ text: /Sem notas/ })).toBeDefined()
+})

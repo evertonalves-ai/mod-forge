@@ -2,10 +2,12 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { Activity, Note, Tab } from '../types'
+import { strings } from './i18n'
+import type { Strings } from './i18n'
 
 // ── Identity ────────────────────────────────────────────────────────────────
 const PANE = 'session-dashboard'
-const TITLE = 'Session dashboard'
+// The title and every other visible text come from i18n.ts (options.language).
 // The command name is written as a literal in register() and in the matcher:
 // the validator reads it from source.
 
@@ -20,10 +22,10 @@ const turns = atom({ plugin: 'session-dashboard', key: 'turns' } as const, [])
 const STORE_NOTES = 'notes'
 
 // ── Drawing helpers (pure, no $) ───────────────────────────────────────────
-const TABS: { id: Tab; label: string; hotkey: string }[] = [
-  { id: 'overview', label: 'Overview', hotkey: '1' },
-  { id: 'activity', label: 'Activity', hotkey: '2' },
-  { id: 'notes', label: 'Notes', hotkey: '3' },
+const tabs = (t: Strings): { id: Tab; label: string; hotkey: string }[] => [
+  { id: 'overview', label: t.tabOverview, hotkey: '1' },
+  { id: 'activity', label: t.tabActivity, hotkey: '2' },
+  { id: 'notes', label: t.tabNotes, hotkey: '3' },
 ]
 const BARS = '▁▂▃▄▅▆▇█'
 
@@ -62,7 +64,9 @@ async function saveNotes($: EngineInterface, list: Note[]) {
   await $.store.set(STORE_NOTES, list)
 }
 
-export const register: Register = on => {
+export const register: Register = (on, options) => {
+  const t = strings(options.language)
+  const TITLE = t.title
   // A turn's start time can be lost on reload without harm, so a module variable is fine.
   let turnStartedAt = 0
 
@@ -72,7 +76,7 @@ export const register: Register = on => {
     // Opened unasked: the pane seats from 144 columns and waits below that.
     void $.ui.open({ id: PANE, title: TITLE })
     // Register commands last: a taken name throws and would skip what follows.
-    await $.command.register({ name: 'dashboard', description: `Open the ${TITLE}`, immediate: true })
+    await $.command.register({ name: 'dashboard', description: t.commandDescription(TITLE), immediate: true })
     return next(e)
   })
 
@@ -131,17 +135,17 @@ export const register: Register = on => {
       <Box flexDirection="column" marginBottom={1}>
         <Box justifyContent="space-between">
           <Text bold color="claude">◆ {TITLE}</Text>
-          <Text color={running > 0 ? 'warning' : 'success'}>{running > 0 ? `◌ ${running} running` : '● idle'}</Text>
+          <Text color={running > 0 ? 'warning' : 'success'}>{running > 0 ? t.running(running) : t.idle}</Text>
         </Box>
         <Box gap={2} marginTop={1}>
-          {TABS.map(t => (
+          {tabs(t).map(item => (
             <Button
-              key={`tab-${t.id}`}
-              label={t.label}
-              hotkey={t.hotkey}
+              key={`tab-${item.id}`}
+              label={item.label}
+              hotkey={item.hotkey}
               plain
-              dimColor={t.id !== current}
-              onPress={() => update($, tab, () => t.id)}
+              dimColor={item.id !== current}
+              onPress={() => update($, tab, () => item.id)}
             />
           ))}
         </Box>
@@ -162,18 +166,18 @@ export const register: Register = on => {
       body = (
         <Box flexDirection="column" gap={1}>
           <Box gap={1} flexWrap="wrap">
-            {kpi('kpi-tools', 'Tool calls', String(list.length), 'text')}
-            {kpi('kpi-errors', 'Errors', String(errors), errors > 0 ? 'error' : 'success')}
-            {kpi('kpi-turns', 'Turns', String(turnList.length), 'text')}
-            {kpi('kpi-avg', 'Avg turn', `${avgTurn}s`, avgTurn > 120 ? 'warning' : 'text')}
+            {kpi('kpi-tools', t.kpiTools, String(list.length), 'text')}
+            {kpi('kpi-errors', t.kpiErrors, String(errors), errors > 0 ? 'error' : 'success')}
+            {kpi('kpi-turns', t.kpiTurns, String(turnList.length), 'text')}
+            {kpi('kpi-avg', t.kpiAvg, `${avgTurn}s`, avgTurn > 120 ? 'warning' : 'text')}
           </Box>
           <Box flexDirection="column">
-            <Text bold>Turn durations</Text>
-            <Text color="claude">{sparkline(turnList, width - 2) || 'No finished turn yet.'}</Text>
+            <Text bold>{t.turnDurations}</Text>
+            <Text color="claude">{sparkline(turnList, width - 2) || t.noFinishedTurn}</Text>
           </Box>
           <Box flexDirection="column">
-            <Text bold>Most used</Text>
-            {top.length === 0 && <Text dimColor>No tool calls yet.</Text>}
+            <Text bold>{t.mostUsed}</Text>
+            {top.length === 0 && <Text dimColor>{t.noToolCalls}</Text>}
             {top.map(([name, count]) => (
               <Box key={`top-${name}`} gap={1}>
                 <Box width={12}><Text wrap="truncate-end">{name}</Text></Box>
@@ -192,14 +196,14 @@ export const register: Register = on => {
           {e.surface !== 'mobile' && 'Select' in ui && (
             <ui.Select
               key="filter"
-              label="Filter"
+              label={t.filter}
               value={tools.includes(currentFilter) ? currentFilter : 'all'}
-              options={tools.map(t => ({ value: t, label: t }))}
+              options={tools.map(tool => ({ value: tool, label: tool === 'all' ? t.all : tool }))}
               onSelect={value => update($, filter, () => value)}
             />
           )}
           <Box flexDirection="column">
-            {shown.length === 0 && <Text dimColor>Nothing here yet.</Text>}
+            {shown.length === 0 && <Text dimColor>{t.nothingHere}</Text>}
             {shown.map(a => (
               <Box key={`act-${a.id}`} gap={1}>
                 <Text dimColor>{clock(a.at)}</Text>
@@ -209,7 +213,7 @@ export const register: Register = on => {
             ))}
           </Box>
           <Box>
-            <Button key="clear-activity" label="c: Clear list" hotkey="c" onPress={() => update($, activity, () => [])} />
+            <Button key="clear-activity" label={t.clearList} hotkey="c" onPress={() => update($, activity, () => [])} />
           </Box>
         </Box>
       )
@@ -219,20 +223,20 @@ export const register: Register = on => {
           {e.surface !== 'mobile' && 'Input' in ui && (
             <ui.Input
               key="new-note"
-              label="New note"
-              placeholder="Type and press Enter"
+              label={t.newNote}
+              placeholder={t.notePlaceholder}
               value=""
-              submitLabel="save"
+              submitLabel={t.save}
               onSubmit={async text => {
                 const clean = text.trim()
                 if (clean === '') return
                 const now = await $.clock.now()
                 await saveNotes($, [...noteList, { id: `n${now}`, text: clean.slice(0, 500), at: now }])
-                $.ui.toast('Note saved')
+                $.ui.toast(t.noteSaved)
               }}
             />
           )}
-          {noteList.length === 0 && <Text dimColor>No notes. They are kept across sessions.</Text>}
+          {noteList.length === 0 && <Text dimColor>{t.noNotes}</Text>}
           {noteList.slice(-rows).map(n => (
             <Box key={`note-${n.id}`} gap={1}>
               <Button key={`del-${n.id}`} label="×" plain onPress={() => saveNotes($, noteList.filter(x => x.id !== n.id))} />
@@ -249,7 +253,7 @@ export const register: Register = on => {
         {header}
         {body}
         <Box marginTop={1}>
-          <Text dimColor>1·2·3 tabs · Tab moves · Esc back to prompt · /dashboard</Text>
+          <Text dimColor>{t.footer}</Text>
         </Box>
       </Box>
     )

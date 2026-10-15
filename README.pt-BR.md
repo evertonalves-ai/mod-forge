@@ -46,11 +46,14 @@ padrões sensatos e anota cada um como premissa.
 
 ## O que vem junto
 
-- 10 mods de exemplo que passam em validação, checagem de tipos e testes (69 no total): painel com abas, faixa
+- 12 mods de exemplo que passam em validação, checagem de tipos e testes (85 no total): painel com abas, faixa
   com o uso do contexto, guarda de comandos perigosos (Bash e PowerShell), comando `/recap`, personalização do
   spinner, aprovação automática restrita a uma lista, consulta a uma API com token seguro, log de ferramentas em
-  arquivo, painel de botões que enviam prompts e gráfico de contexto em SVG no app desktop.
-- Um script que roda as três checagens de uma vez sem escrever nada na pasta do mod.
+  arquivo, painel de botões que enviam prompts, gráfico de contexto em SVG no app desktop, painel com o status
+  dos subagentes e painel com a conversa entre dois agentes. Os que mostram texto têm a opção `language`
+  (inglês por padrão, ou pt-BR).
+- Um script que roda as três checagens de uma vez sem escrever nada na pasta do mod, e o `say.mjs`, que grava
+  o diálogo de uma rodada de revisão entre dois agentes.
 - Um catálogo de ideias de mods, montado a partir de listas da comunidade.
 - Os 10 cenários de teste de aceitação da própria skill, com os resultados.
 

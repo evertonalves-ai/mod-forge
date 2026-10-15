@@ -1,0 +1,21 @@
+{
+  "name": "agent-board",
+  "version": "0.1.0",
+  "description": "/agents pane: every subagent of this session with its role and live status",
+  "author": {
+    "name": "mod-forge example"
+  },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Language of the text this mod shows: en (English) or pt-BR (Português do Brasil)",
+      "options": [
+        "en",
+        "pt-BR"
+      ],
+      "default": "en"
+    }
+  }
+}

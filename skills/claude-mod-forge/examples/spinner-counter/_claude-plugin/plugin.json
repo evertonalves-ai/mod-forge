@@ -2,6 +2,20 @@
   "name": "spinner-counter",
   "version": "0.1.0",
   "description": "Customises Claude Code's own spinner: adds the tool calls of the current turn after its word, keeping the native animation",
-  "author": { "name": "mod-forge example" },
-  "types": "./types/index.d.ts"
+  "author": {
+    "name": "mod-forge example"
+  },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Language of the text this mod shows: en (English) or pt-BR (Português do Brasil)",
+      "options": [
+        "en",
+        "pt-BR"
+      ],
+      "default": "en"
+    }
+  }
 }

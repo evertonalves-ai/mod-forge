@@ -33,3 +33,14 @@ test('the native spinner is kept and the count is added after its word', async (
   const ui = await $.ui.mount({ ...SPINNER, surface: 'terminal' })
   expect(await ui.find({ text: 'Thinking…' })).toBeDefined()
 })
+
+test('language pt-BR: the count is written in Portuguese', { options: { language: 'pt-BR' } }, async ($, on) => {
+  on('turn.start', ($, e) => ({ turnId: e.turnId }))
+  on('tool.call', () => ({ result: 'ok' }))
+  on('ui.render', { component: 'Spinner' }, ($, e) => ({ type: 'Text', props: {}, children: [`${e.props.word}${e.props.suffix}`] }))
+  await $.turn.start({ turnId: 't1', text: 'go' })
+  await $.tool.call({ tool: 'Bash', command: 'ls' })
+  await $.tool.call({ tool: 'Read', file_path: 'a.md' })
+  const ui = await $.ui.mount({ ...SPINNER, surface: 'terminal' })
+  expect(await ui.find({ text: 'Thinking… · 2 ferramentas' })).toBeDefined()
+})

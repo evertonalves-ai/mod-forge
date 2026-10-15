@@ -1,0 +1,27 @@
+{
+  "name": "agent-dialogue",
+  "version": "0.1.0",
+  "description": "/dialogue pane: the live conversation two agents write to a shared JSONL file, with an author filter",
+  "author": {
+    "name": "mod-forge example"
+  },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "file": {
+      "type": "file",
+      "title": "Dialogue file",
+      "description": "JSONL file the agents append to (one {from, to, kind, text, ts} per line), e.g. the file scripts/say.mjs writes",
+      "default": ""
+    },
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Language of the text this mod shows: en (English) or pt-BR (Português do Brasil)",
+      "options": [
+        "en",
+        "pt-BR"
+      ],
+      "default": "en"
+    }
+  }
+}

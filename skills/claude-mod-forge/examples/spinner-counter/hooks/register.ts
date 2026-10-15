@@ -1,11 +1,15 @@
 import { atom, read, update } from 'claude-code'
 import type { Register } from 'claude-code'
 
+import { strings } from './i18n'
+
 // Rewrites a native render site instead of replacing it: next() with changed props keeps
 // Claude Code's spinner (animation, word, mode) and only adds text after the word.
 const calls = atom({ plugin: 'spinner-counter', key: 'calls' } as const, 0)
 
-export const register: Register = on => {
+export const register: Register = (on, options) => {
+  const t = strings(options.language)
+
   on('turn.start', async ($, e, next) => {
     await update($, calls, () => 0)
     return next(e)
@@ -20,7 +24,7 @@ export const register: Register = on => {
   on('ui.render', { component: 'Spinner' }, async ($, e, next) => {
     const n = await read($, calls)
     if (n === 0) return next(e) // nothing to add: leave the native spinner untouched
-    const suffix = `${e.props.suffix} · ${n} tool call${n === 1 ? '' : 's'}`
+    const suffix = `${e.props.suffix} · ${t.toolCalls(n)}`
     return next({ ...e, props: { ...e.props, suffix } })
   })
 }

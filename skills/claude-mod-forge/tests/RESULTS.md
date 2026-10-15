@@ -5,16 +5,18 @@ Environment: Windows 10, Claude Code CLI 2.1.294, mods API types 2.1.293, Node 2
 ## 1. Reference mods (structural + types + kit), after the fixes below
 | Example | validate | strict tsc | `claude plugin test` |
 |---|---|---|---|
-| session-dashboard | pass | pass | 4/4 |
-| context-band | pass | pass | 3/3 |
+| session-dashboard | pass | pass | 5/5 |
+| context-band | pass | pass | 4/4 |
 | shell-guard | pass | pass | 14/14 |
 | git-recap | pass | pass | 6/6 |
-| spinner-counter | pass | pass | 1/1 |
+| spinner-counter | pass | pass | 2/2 |
 | scoped-approve (0.2.0) | pass | pass | 8/8 |
-| api-status (0.2.0) | pass | pass | 7/7 |
+| api-status (0.2.0) | pass | pass | 9/9 |
 | tool-log (0.2.0) | pass | pass | 16/16 |
-| prompt-buttons (0.2.0) | pass | pass | 6/6 |
-| context-chart (0.2.0) | pass | pass | 4/4 |
+| prompt-buttons (0.2.0) | pass | pass | 7/7 |
+| context-chart (0.2.0) | pass | pass | 5/5 |
+| agent-board (new) | pass | pass | 4/4 |
+| agent-dialogue (new) | pass | pass | 5/5 |
 | plugin `mod-forge` manifest + marketplace | pass | — | — |
 
 Kit tests mount drawings on the `terminal` and `desktop` surfaces. **Not run:** painting in a real terminal or
@@ -88,3 +90,6 @@ redaction no longer hides non-secrets (monkey:, tokenizer:, https://keycloak:844
 | docs: surface tables, dead reference, store expiry claim | low | fixed |
 
 Totals after the rounds: 10/10 examples green, 69 kit tests.
+
+After round 3 (agent-board and agent-dialogue added as examples 11-12, `language` option en/pt-BR on the eight
+examples with visible text, `scripts/say.mjs`): 12/12 examples green, 85 kit tests (table in section 1).

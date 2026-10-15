@@ -58,3 +58,9 @@ test('where no pane can be placed, /context-chart answers in text', async ($, on
   const reply = await $.command.run({ command: 'context-chart', args: '', ...TYPED })
   expect(reply.text).toMatch(/25%$/)
 })
+
+test('language pt-BR: heading and empty state are in Portuguese', { options: { language: 'pt-BR' } }, async ($, on) => {
+  const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  expect(await ui.find({ text: '◆ Contexto' })).toBeDefined()
+  expect(await ui.find({ text: /Nenhuma leitura ainda/ })).toBeDefined()
+})

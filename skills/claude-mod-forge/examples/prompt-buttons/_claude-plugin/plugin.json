@@ -2,6 +2,20 @@
   "name": "prompt-buttons",
   "version": "0.1.0",
   "description": "A pane of buttons you define; each sends a saved instruction to Claude (queued if Claude is busy). Also /buttons [n] for surfaces that draw nothing",
-  "author": { "name": "mod-forge example" },
-  "types": "./types/index.d.ts"
+  "author": {
+    "name": "mod-forge example"
+  },
+  "types": "./types/index.d.ts",
+  "userConfig": {
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Language of the text this mod shows: en (English) or pt-BR (Português do Brasil)",
+      "options": [
+        "en",
+        "pt-BR"
+      ],
+      "default": "en"
+    }
+  }
 }

@@ -68,3 +68,18 @@ test('/context-band brings the band back after hide', async ($, on) => {
   const hidden = await $.command.run({ command: 'context-band', ...typed })
   expect(hidden.text).toMatch(/hidden/)
 })
+
+test('language pt-BR: the band and the command reply are in Portuguese', { options: { language: 'pt-BR' } }, async ($, on) => {
+  on('session.usage', () => usage(50_000))
+  on('turn.complete', () => ({ text: '' }))
+  on('ui.render', { component: 'AbovePrompt' }, ($, e) => {
+    const { Box } = $.ui.resolve(e)
+    return <Box key="engine" />
+  })
+  await $.turn.complete({ turnId: 't1', answer: 'ok', durationMs: 10, isAborted: false, reason: 'answer' as const })
+  const ui = await $.ui.mount({ ...BAND, surface: 'terminal' })
+  expect(await ui.find({ text: /contexto · folgado/ })).toBeDefined()
+  const typed = { args: '', origin: { kind: 'composer' }, presentation: { isFullscreen: true, columns: 120 } } as const
+  const hidden = await $.command.run({ command: 'context-band', ...typed })
+  expect(hidden.text).toBe('Faixa de contexto oculta. Use /context-band para mostrar de novo.')
+})

@@ -77,8 +77,9 @@ skills/claude-mod-forge/
   references/            official docs map, interview, category quizzes, API, events, UI + design system,
                          state, security, testing, distribution, surfaces
   templates/             project spec · requirements · test plan · security review · release checklist
-  examples/              10 reference mods, 69 kit tests (validated, type-checked, tested)
+  examples/              12 reference mods, 85 kit tests (validated, type-checked, tested; en/pt-BR text)
   scripts/check-mod.mjs  validate + strict tsc + claude plugin test, in one run
+  scripts/say.mjs        shared dialogue file for a two-agent review round (shown by agent-dialogue)
   tests/                 acceptance (A–J), discovery and regression definitions + RESULTS.md
 ```
 

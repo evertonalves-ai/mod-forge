@@ -66,6 +66,21 @@ A digit hotkey on the band also fires from an empty prompt.
 `$.state` reads subscribe automatically: writing the atom redraws its readers. Module variables need
 `$.ui.invalidate('ui.render')`. Timers: `$.clock.every(ms, …)`. Throttled to 10/s (30/s visible pane in terminal).
 
+## Language option
+Every example with visible text follows one pattern; reuse it when a mod needs more than one language.
+- `hooks/i18n.ts` is pure (no `$` calls): one object per language with the same keys (`const ptBR: typeof en`),
+  functions for text with values (``working: (n) => `◌ ${n} working` ``), and `strings(language)` that returns
+  the table for `'pt-BR'` and English for anything else (missing, misspelled, unknown).
+- `plugin.json` userConfig: `"language": { "type": "string", "title": "Language", "description": "…",
+  "options": ["en", "pt-BR"], "default": "en" }`.
+- `register(on, options)` calls `const t = strings(options.language)` once and uses `t.x` for titles, labels,
+  placeholders, toasts, empty states, footers and `/command` replies. Pure helper modules that return messages
+  take the table as a last parameter defaulting to English, so their tests stay unchanged.
+- Never translated: command names, pane ids, atom and store keys, button keys (tests and saved data use them),
+  and text Claude reads as a tool result (deny reasons stay English).
+- Test it: one kit test with `{ options: { language: 'pt-BR' } }` asserting a key Portuguese string draws; the
+  English tests stay as they are, so the default cannot drift.
+
 ## Design system (what "professional" means here)
 **Anatomy of a pane:** header (title `bold color="claude"` + state on the right) → tabs (plain Buttons with
 hotkeys 1..9, inactive ones `dimColor`) → body → footer (available keys in `dimColor`).
