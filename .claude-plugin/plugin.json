@@ -1,6 +1,6 @@
 {
   "name": "mod-forge",
-  "version": "0.5.1",
+  "version": "0.6.0",
   "description": "The claude-mod-forge skill: turns a plain-language idea into a tested Claude Code mod (interview, spec, code, checks, packaging)",
   "author": {
     "name": "Everton Alves"

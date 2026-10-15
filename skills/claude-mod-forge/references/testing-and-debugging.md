@@ -72,4 +72,6 @@ whether mods can load at all. Full symptom table: `workflows/debug.md`.
 | A `$.fs` stub sees `C:\…` while the mod wrote `C:/…` | the engine hands paths over in the platform's absolute form: compare by suffix |
 | `on("ui.toast") registered twice` in a test | one stub per event (and matcher) per test: share it through the helper |
 | A stub for `$.http.fetch` needs to simulate "network down" | return `{ deny: '…' }` (the call rejects in the mod) |
+| `test's model.complete hook was skipped: returned neither { value } nor { deny }` | `$.model.complete` is a `$` call: answer `{ value: { isAnswered: true, text, usage } }`, not the result bare |
+| A `$.model.complete` stub that waits with `clock.sleep` is not cut by the mod's `AbortSignal` | the wait is the test's own; `clock.advance` past it. The engine resolves a real aborted call as `{ isAnswered: false, reason: 'aborted' }` |
 | Unsure what a hook drew | `console.log(JSON.stringify(await ui.drawn()))` inside the test |

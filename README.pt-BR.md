@@ -65,7 +65,7 @@ opções. Se disser "decide você", ela escolhe padrões sensatos e anota cada u
 - Diz o que foi testado e o que não foi. Os testes provam a lógica e o que o mod desenha; a aparência final na
   sua janela precisa ser vista numa sessão de verdade.
 
-## Os 12 mods de exemplo
+## Os 13 mods de exemplo
 
 Vêm junto com a skill, prontos para usar ou copiar. Cada um tem um README em português explicando o que faz,
 o que aparece na tela, atalhos e como instalar.
@@ -84,8 +84,9 @@ o que aparece na tela, atalhos e como instalar.
 | [prompt-buttons](skills/claude-mod-forge/examples/prompt-buttons/README.pt-BR.md) | Botões seus que mandam ao Claude, com uma tecla, pedidos que você repete |
 | [agent-board](skills/claude-mod-forge/examples/agent-board/README.pt-BR.md) | Quadro ao vivo dos agentes auxiliares da sessão e do status de cada um |
 | [agent-dialogue](skills/claude-mod-forge/examples/agent-dialogue/README.pt-BR.md) | A conversa entre dois agentes que revisam um trabalho, ao vivo |
+| [ideia](skills/claude-mod-forge/examples/ideia/README.pt-BR.md) | Dois pensadores com pontos de vista diferentes refinam sua ideia em diálogo; você direciona, ele escreve o plano |
 
-Todos passam nas três checagens (89 testes no total). Os que mostram texto têm a opção `language`: inglês por
+Todos passam nas três checagens (110 testes no total). Os que mostram texto têm a opção `language`: inglês por
 padrão, ou `pt-BR`.
 
 ## Instalação

@@ -95,6 +95,7 @@ Start from the closest example in `examples/` (rename `_claude-plugin` → `.cla
 | `context-chart` | Data pushed by `session.measure`; one data layer, two renderings: `Svg` on desktop, text bars on the terminal, picked by `e.surface` |
 | `agent-board` | `/agents` pane of this session's subagents from `$.agent.list()` polled every 2 s, status labels, text fallback |
 | `agent-dialogue` | `/dialogue` pane that tails a JSONL file agents append to (`scripts/say.mjs`), tolerant parser, author `Select`, `file` userConfig with no default path |
+| `ideia` | A conversation driven by `$.model.complete` (no tools): two system prompts, an `AbortController` for "finish now", a pure state machine folded from a JSONL event log (resume across sessions), round-end pause, comments, `$.prompt.submit` behind a button |
 
 Every example with visible text takes a `language` option (`en` default, `pt-BR`) through `hooks/i18n.ts`;
 see "Language option" in `references/ui-components.md`.

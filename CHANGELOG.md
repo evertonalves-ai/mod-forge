@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.6.0 — 2026-10-15
+- New reference mod `ideia` (13 in total, 110 kit tests): `/ideia <idea>` has two thinkers with different lines of
+  thought and methods refine an idea in rounds (A opens, B responds, A replies). The mod suggests a pair from a menu
+  of six, or the user picks one or writes their own; the pair can change between rounds. The user comments at any
+  time, the pane pauses at each round end with a summary, and the conversation ends at the round limit or when both
+  sides say nothing is left. Side A writes `ideia.md`, side B checks it against the conversation; optional Obsidian
+  frontmatter; a "build it as a mod" button. Each message is a `$.model.complete` call with no tools; the mod
+  writes only inside the configured folder; conversations resume from `dialogue.jsonl`.
+- Design spec and plan under `docs/superpowers/`.
+- References: model completions as tool-less personas, aborting a completion, `$.model.complete` stubs answer
+  `{ value }`.
+
 ## 0.5.1 — 2026-10-15
 - Public release prep. The repository moves to evertonalves-ai/mod-forge (same name as the plugin).
 - Plain-language README.md and README.pt-BR.md for each of the 12 example mods: what it does, what you see,

@@ -66,6 +66,12 @@ const text = r.isAnswered ? r.text : `unavailable (${r.reason})`
 ```
 Bills the user's plan/key. Run on a user action, not on every event. Cache long static prefixes with
 `prompt: [{ text: RULES, cache: true }, { text: input }]`.
+- A completion has **no tools and no history**: a safe way to give a "persona" a voice (examples/ideia runs a
+  two-sided dialogue this way) without a subagent that could read or change files.
+- `$.model.complete(req, { signal })`: aborting the plugin's own `AbortController` cuts the call, which resolves
+  `{ isAnswered: false, reason: 'aborted' }`. Every arm carries `usage` (`input_tokens`, `output_tokens`, cache fields).
+- `$.agent.spawn({ prompt, subagentType })` starts a real subagent in the background; its answer is its own
+  `turn.complete` carrying the `agentId`. Prefer a completion unless the work needs tools.
 
 ## Background work
 ```ts

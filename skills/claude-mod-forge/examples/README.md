@@ -1,4 +1,4 @@
-# Reference mods (12 mods, 89 kit tests)
+# Reference mods (13 mods, 110 kit tests)
 
 Complete, working mods the skill copies from. Each one passes `claude plugin validate`, strict `tsc` and
 `claude plugin test` (run `node ../scripts/check-mod.mjs <name>`). The manifest folder is stored as
@@ -22,6 +22,7 @@ see "Language option" in `../references/ui-components.md`. Deny reasons Claude r
 | `context-chart` | `/context-chart` pane: context use per turn | `session.measure` push, `Svg` on desktop and text bars on terminal chosen by `e.surface`, language option | session.measure, session.start, command.run, ui.render(Pane) | command, state, ui | 5 |
 | `agent-board` | `/agents` pane: every subagent of this session with its role and live status | `$.agent.list()` polled every 2 s (no push event), status table, text fallback, language option | session.start, command.run, ui.render(Pane) | agent.list, clock, command, state, ui | 4 |
 | `agent-dialogue` | `/dialogue` pane: the live conversation agents append to a JSONL file (`../scripts/say.mjs`), with an author filter | tolerant JSONL parser, `file` userConfig with no default path (the pane says how to set it), `Select` filter, text fallback, language option | session.start, command.run, ui.render(Pane) | fs, clock, command, state, ui | 5 |
+| `ideia` | `/ideia <idea>` pane: two thinkers with different lines of thought and methods refine an idea in rounds; the user comments, pauses, changes the pair; ends with `ideia.md` | a dialogue driven by `$.model.complete` (no tools), an `AbortController` for "finish now", a pure state machine folded from a JSONL event log (resume), `directory`/`number`/`boolean` userConfig, round-end pause, `$.prompt.submit` behind a button, language option | session.start, command.run, ui.render(Pane) | model.complete, fs, store, clock, command, prompt.submit, state, ui | 21 |
 
 What these tests cover: hook logic and drawn trees on the `terminal` and `desktop` surfaces through the
 official test kit. They do not cover painting in a real terminal or the Desktop app: check that in a session

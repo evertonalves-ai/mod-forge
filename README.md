@@ -65,7 +65,7 @@ picks sensible defaults and writes each one down.
 - Verification is reported by level: static checks, unit tests, real session. A level that did not run is
   never claimed.
 
-## The 12 example mods
+## The 13 example mods
 
 They ship with the skill, ready to use or copy. Each has its own README (English and Portuguese) with what it
 does, what you see, shortcuts and how to install it.
@@ -84,8 +84,9 @@ does, what you see, shortcuts and how to install it.
 | [prompt-buttons](skills/claude-mod-forge/examples/prompt-buttons/README.md) | Your own buttons that send requests you repeat, with one key |
 | [agent-board](skills/claude-mod-forge/examples/agent-board/README.md) | A live board of the session's helper agents and their status |
 | [agent-dialogue](skills/claude-mod-forge/examples/agent-dialogue/README.md) | The conversation between two reviewing agents, live |
+| [ideia](skills/claude-mod-forge/examples/ideia/README.md) | Two thinkers with different points of view refine your idea by dialogue; you steer, it writes the plan |
 
-All pass the three checks (89 tests in total). Those with on-screen text have a `language` option: English by
+All pass the three checks (110 tests in total). Those with on-screen text have a `language` option: English by
 default, or `pt-BR`. The [examples table](skills/claude-mod-forge/examples/README.md) lists the hooks and API
 calls each one demonstrates.
 
@@ -138,7 +139,7 @@ skills/claude-mod-forge/
   references/            official docs map, interview, category quizzes, API, events, UI + design system,
                          state, security, testing, distribution, surfaces, idea catalog
   templates/             project spec · requirements · test plan · security review · release checklist
-  examples/              12 reference mods, 89 kit tests, a README per mod (en + pt-BR)
+  examples/              13 reference mods, 110 kit tests, a README per mod (en + pt-BR)
   scripts/check-mod.mjs  validate + strict tsc + claude plugin test, in one run
   scripts/say.mjs        shared dialogue file for a two-agent review round (shown by agent-dialogue)
   tests/                 acceptance (A–J), discovery and regression definitions + RESULTS.md
