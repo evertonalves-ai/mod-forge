@@ -1,5 +1,7 @@
 # claude-mod-forge
 
+[![check](https://github.com/evertonalves-ai/claude-mod-forge/actions/workflows/check.yml/badge.svg)](https://github.com/evertonalves-ai/claude-mod-forge/actions/workflows/check.yml)
+
 [Resumo em português](README.pt-BR.md)
 
 A Claude Code skill that builds [mods](https://code.claude.com/docs/en/plugins/mods/overview) from a description.
@@ -77,7 +79,7 @@ skills/claude-mod-forge/
   references/            official docs map, interview, category quizzes, API, events, UI + design system,
                          state, security, testing, distribution, surfaces
   templates/             project spec · requirements · test plan · security review · release checklist
-  examples/              12 reference mods, 85 kit tests (validated, type-checked, tested; en/pt-BR text)
+  examples/              12 reference mods, 89 kit tests (validated, type-checked, tested; en/pt-BR text)
   scripts/check-mod.mjs  validate + strict tsc + claude plugin test, in one run
   scripts/say.mjs        shared dialogue file for a two-agent review round (shown by agent-dialogue)
   tests/                 acceptance (A–J), discovery and regression definitions + RESULTS.md

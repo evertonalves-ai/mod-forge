@@ -16,6 +16,16 @@
         "off"
       ],
       "default": "ask"
+    },
+    "language": {
+      "type": "string",
+      "title": "Language",
+      "description": "Language of the text this mod shows: en (English) or pt-BR (Português do Brasil)",
+      "options": [
+        "en",
+        "pt-BR"
+      ],
+      "default": "en"
     }
   }
 }

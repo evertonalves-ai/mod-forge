@@ -92,3 +92,20 @@ test('language pt-BR: title, cards and tabs are in Portuguese', { options: { lan
   await ui.press({ key: 'tab-notes' })
   expect(await ui.find({ text: /Sem notas/ })).toBeDefined()
 })
+
+test('totals keep counting past the 300-row activity list', async ($, on) => {
+  mock.clock(on)
+  on('tool.call', () => ({ result: 'ok' }))
+  for (let i = 0; i < 305; i += 1) await $.tool.call({ tool: 'Glob', pattern: '*' })
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ text: '305' })).toBeDefined()
+})
+
+test('a call that never gets an answer is not left running', async ($, on) => {
+  mock.clock(on)
+  // No tool.call stand-in: next() rejects inside the mod, as an interrupted call would.
+  await $.tool.call({ tool: 'Bash', command: 'sleep 999' }).catch(() => undefined)
+  const ui = await $.ui.mount({ ...PANE, surface: 'terminal' })
+  expect(await ui.find({ text: /idle/ })).toBeDefined()
+  expect(await ui.find({ text: /running/ })).toBeUndefined()
+})

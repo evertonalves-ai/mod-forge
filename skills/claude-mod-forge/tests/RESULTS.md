@@ -5,9 +5,9 @@ Environment: Windows 10, Claude Code CLI 2.1.294, mods API types 2.1.293, Node 2
 ## 1. Reference mods (structural + types + kit), after the fixes below
 | Example | validate | strict tsc | `claude plugin test` |
 |---|---|---|---|
-| session-dashboard | pass | pass | 5/5 |
+| session-dashboard | pass | pass | 7/7 |
 | context-band | pass | pass | 4/4 |
-| shell-guard | pass | pass | 14/14 |
+| shell-guard | pass | pass | 16/16 |
 | git-recap | pass | pass | 6/6 |
 | spinner-counter | pass | pass | 2/2 |
 | scoped-approve (0.2.0) | pass | pass | 8/8 |
@@ -92,4 +92,27 @@ redaction no longer hides non-secrets (monkey:, tokenizer:, https://keycloak:844
 Totals after the rounds: 10/10 examples green, 69 kit tests.
 
 After round 3 (agent-board and agent-dialogue added as examples 11-12, `language` option en/pt-BR on the eight
-examples with visible text, `scripts/say.mjs`): 12/12 examples green, 85 kit tests (table in section 1).
+examples with visible text, `scripts/say.mjs`): 12/12 examples green, 85 kit tests.
+
+## 6. Acceptance re-run on v0.4.0 (2026-10-15)
+Method as in section 2: five local subagents (two cases each) read only the skill, followed it in plan-only
+mode with no installs and no writes, and were graded against `acceptance-tests.md`.
+
+Result: **10/10 cases passed (A–J).** Notes from the run, applied in v0.5.0:
+- `.catch` semantics: `next(e)` after `next` was already called returns that call's result and does not run the
+  tool again; approvers cover every command tool (Bash, PowerShell) and `e.ceiling` is noted (cap unverified).
+- `$.http.fetch` limits labelled as docs-sourced wherever they appear.
+- A "no mod needed" path: native permission rules and modes first, settings changed only with an explicit yes.
+- Buttons: more than 9 actions → second tab, `Select` or navigation; `$.prompt.submit` without `asUser` is not
+  acting as the user, `asUser` needs a yes.
+- The terminal / VS Code split is stated before interview round 1; no "where should it show" when the request
+  already names the place.
+- Built-in tool input types exist only after the first load; re-run the checker then.
+- continue/improve: undated spec loses to a dated decision, "untouched example" defined, README created if missing;
+  validate's "gating hook without .catch" is expected for observers and self-answering commands.
+- create: "small" defined (one hook or site, no persistence, no matrix capability).
+- `shell-guard` gained the en/pt-BR language option (question, options, toast; deny reasons stay English).
+- CI: `.github/workflows/check.yml` runs validate and the kit tests of every example on push and pull request;
+  strict tsc there is non-blocking because the public types file is from an older build (see the workflow).
+
+Totals after v0.5.0: 12/12 examples green, 89 kit tests (table in section 1).

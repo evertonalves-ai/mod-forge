@@ -2,8 +2,17 @@
 
 ## The checker
 `node scripts/check-mod.mjs <mod> [--types <d.ts>] [--json]` copies the mod to a temp folder, renames
-`_claude-plugin`, runs `claude plugin validate`, strict `tsc` (TypeScript 5.6 via npx, tsconfig outside the mod)
+`_claude-plugin`, runs `claude plugin validate`, strict `tsc` (TypeScript 5.9.3 via npx, tsconfig outside the mod)
 and `claude plugin test`, and prints pass/fail/skipped per step. Skipped is never reported as passed.
+
+**Tool input types appear after the first load.** The built-in tool inputs (`claude-code-tools/`, which type
+`e.command`, `e.file_path`…) are laid out in `<mod>/.claude-plugin/types/` only once the mod has loaded. Before
+that, use the field names the examples use and expect looser types; after the first load, re-run the checker:
+it type-checks that whole folder.
+
+**Reading validate's `gating hook` lines.** `gating hook without .catch` is expected for observers (they fail
+open on purpose) and for a `command.run` hook that answers its own command. A guard (a `tool.call` that denies,
+a `prompt.submit` that drops, a `tool.check`) must show `gating hook with .catch`.
 
 ## Test kit essentials
 ```ts

@@ -1,5 +1,7 @@
 # claude-mod-forge (resumo em português)
 
+[![check](https://github.com/evertonalves-ai/claude-mod-forge/actions/workflows/check.yml/badge.svg)](https://github.com/evertonalves-ai/claude-mod-forge/actions/workflows/check.yml)
+
 Skill do Claude Code que cria [mods](https://code.claude.com/docs/en/plugins/mods/overview) a partir de uma
 descrição em linguagem comum. Você diz o que quer ("um painel com o status do meu build", "me pergunte antes de
 qualquer force push", "mostre o uso do contexto acima do prompt"), responde algumas perguntas e recebe o mod
@@ -46,7 +48,7 @@ padrões sensatos e anota cada um como premissa.
 
 ## O que vem junto
 
-- 12 mods de exemplo que passam em validação, checagem de tipos e testes (85 no total): painel com abas, faixa
+- 12 mods de exemplo que passam em validação, checagem de tipos e testes (89 no total): painel com abas, faixa
   com o uso do contexto, guarda de comandos perigosos (Bash e PowerShell), comando `/recap`, personalização do
   spinner, aprovação automática restrita a uma lista, consulta a uma API com token seguro, log de ferramentas em
   arquivo, painel de botões que enviam prompts, gráfico de contexto em SVG no app desktop, painel com o status

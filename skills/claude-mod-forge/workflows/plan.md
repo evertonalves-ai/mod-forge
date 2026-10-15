@@ -2,6 +2,10 @@
 
 Use when the user asks for a design first, or the mod is large or risky. Produces a spec, writes no mod code.
 
+0. Check whether a native feature already covers it (SKILL.md §1, "No mod needed"): permission rules,
+   `/permissions`, or a permission mode (`acceptEdits`, `auto`, `dontAsk`, `plan`; `bypassPermissions` needs
+   `allowDangerouslySkipPermissions`). If it does, the plan is that setting: explain it and its risk, and apply
+   it only after an explicit yes (the `update-config` skill or `/permissions`). Plan a mod only for what is left.
 1. Ground truth (SKILL.md §0). Read the `.d.ts` sections for every event and method the idea seems to need,
    and confirm each exists in this build. List anything that does not exist and what can replace it.
 2. Interview (`references/discovery-and-quiz.md`) until every field of `templates/project-spec.md` has an answer

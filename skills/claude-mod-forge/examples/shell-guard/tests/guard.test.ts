@@ -130,3 +130,31 @@ test('rules: a flag glued to a quote and a quoted +refspec are still caught', ()
   expect(riskOf("git push origin '+HEAD:main'")?.label).toBe('force push')
   expect(riskOf('git push origin "main"')).toBeUndefined()
 })
+
+test('language pt-BR: the question and its options are in Portuguese, the deny reason stays English', { options: { language: 'pt-BR' } }, async ($, on) => {
+  const asked: { question: string; options: string[] }[] = []
+  on('tool.call', ($, e) => {
+    if (e.tool === 'AskUserQuestion') {
+      const q = (e as unknown as { questions: { question: string; options: { label: string }[] }[] }).questions[0]
+      asked.push({ question: q?.question ?? '', options: (q?.options ?? []).map(o => o.label) })
+      return { result: { answers: { [q?.question ?? '']: 'Recusar' } } }
+    }
+    return { result: 'ran' }
+  })
+  const out = await $.tool.call({ tool: 'Bash', command: 'git reset --hard HEAD~3' })
+  expect(asked[0]?.question).toMatch(/^reset --hard \(descarta trabalho não commitado\)\. Executar este comando\?/)
+  expect(asked[0]?.options).toEqual(['Executar', 'Recusar'])
+  expect(out.deny).toMatch(/The user declined this hard reset/)
+})
+
+test('language pt-BR: block mode toasts in Portuguese', { options: { mode: 'block', language: 'pt-BR' } }, async ($, on) => {
+  const toasts: string[] = []
+  engine(on, 'Executar')
+  on('ui.toast', ($, e) => {
+    toasts.push(e.text)
+    return { value: undefined }
+  })
+  const out = await $.tool.call({ tool: 'Bash', command: 'git push --force' })
+  expect(toasts).toEqual(['Bloqueado: push forçado'])
+  expect(out.deny).toMatch(/blocked a force push/)
+})

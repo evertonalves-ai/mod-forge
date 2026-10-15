@@ -16,7 +16,10 @@ Answer in the language the user writes in; files and code comments stay in Engli
    `claude-code.d.ts`. Remember both paths. If it is missing or disabled, use the fallback in `references/official-docs.md`.
 3. The `.d.ts` is the authority. Before using any event, method, element, prop or result shape that is not in an
    example here, `grep` it in the `.d.ts` and read the declaration. Docs and this skill can lag the build.
-   Never invent an event, method, prop, metric or data source.
+   Never invent an event, method, prop, metric or data source. The built-in tool input types
+   (`claude-code-tools/`: `e.command`, `e.file_path`…) exist only after a mod has loaded once; before that, use
+   the field names the examples use and re-run the checker after the first load (it type-checks the whole
+   laid-out `<mod>/.claude-plugin/types/` folder).
 4. Version mismatch: the `.d.ts` may be one build behind the CLI (e.g. types 2.1.293, CLI 2.1.294). Use it, record
    both versions in the spec, and once the mod has loaded prefer `<mod>/.claude-plugin/types/` (written by the running build).
 5. Where to work: a new mod starts in the session mods folder. An existing mod is edited **where it lives**
@@ -36,6 +39,12 @@ Answer in the language the user writes in; files and code comments stay in Engli
 | "test it / does it work" | **test** | `workflows/test.md` |
 | "share / publish / install for my team" | **package** | `workflows/package.md` |
 | "continue / pick up where we stopped" | **continue** | `workflows/continue.md` |
+
+**No mod needed** is a valid answer. When a native feature already does it (permission rules in settings or
+`/permissions`; permission modes `acceptEdits`, `auto`, `dontAsk`, `plan`, `bypassPermissions`, the last one only
+with `allowDangerouslySkipPermissions` per the `.d.ts`), say so, explain what it does and its risk, and offer it
+first. Change settings only after the user's explicit yes, through the `update-config` skill or `/permissions`;
+never edit them silently. Build a mod only when the native feature cannot do what the user needs.
 
 A mod that only *restricts* (blocks, asks, warns) stays in create with a full spec; it does not need plan mode.
 An existing mod folder in the conversation or the working directory makes it improve/debug/continue, not create.

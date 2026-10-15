@@ -38,7 +38,9 @@ Pick optional elements by `e.surface` (the run-time element table lists every el
 5. `$.ui.ask`, toasts, status and log lines are not documented for VS Code: guards must default to the safe
    answer when `$.ui.ask` rejects.
 
-When the user asks for "terminal and VS Code", state this split before building.
+When the user mentions VS Code (or "every surface"), state this split **before interview round 1**: behaviour
+(guards, commands, hooks) runs everywhere; drawing is guaranteed only in the terminal and the Desktop app; in
+VS Code plan on the text path. Then ask the round-1 questions with that settled.
 
 ## Narrow terminals
 Panes opened unasked wait below 144 columns (110 after the user opened them once); inline panes sit above the

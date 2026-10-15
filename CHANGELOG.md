@@ -1,5 +1,16 @@
 # Changelog
 
+## 0.5.0 — 2026-10-15
+- First real-session check (desktop app): the session-dashboard capture exposed three bugs the kit tests missed;
+  fixed with tests: tool totals capped at 300, calls stuck "running" after an interruption, bars wrapping.
+- Acceptance re-run on v0.4.0: 10/10 cases (A–J) passed; their notes applied (no-mod-needed path, buttons and
+  asUser, VS Code split before round 1, tool types before first load, continue/improve clarifications,
+  docs-sourced http limits, .catch replay semantics, approvers over every command tool).
+- shell-guard gains the en/pt-BR language option (deny reasons stay English).
+- CI: .github/workflows/check.yml runs validate + kit tests on every example without a Claude login; strict tsc
+  is informational until the public types file catches up with the build.
+- 12/12 examples green, 89 kit tests.
+
 ## 0.4.0 — 2026-10-15
 - Two new reference mods (12 in total, 85 kit tests): `agent-board` (/agents: live status of this session's
   agents) and `agent-dialogue` (/dialogue: a conversation agents write to a shared JSONL file).

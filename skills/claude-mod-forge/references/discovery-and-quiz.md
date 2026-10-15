@@ -79,7 +79,10 @@ distribute. Lower levels cut scope, never code quality: a prototype still valida
    "Stop or ask before risky commands" · "A /command that does a job for me" · "Something else".
    Round-1 option sets must fit the request: a logging mod asks "where should the log go" (file / pane /
    transcript lines / debug log), not "where should it show".
-2. "Where should it show?" — band / side pane / when I type a command / no screen, just behaviour
+2. "Where should it show?" — band / side pane / when I type a command / no screen, just behaviour.
+   Skip it when the request already names the place ("a dashboard", "a panel", "a pane", "a band above the
+   prompt", "a /command"): ask instead **what it shows** (which data, which actions), with options drawn from
+   the real data sources for that category.
 3. "Should it only watch, or also change or block things?" (only if behaviour is implied)
 
 **Round 2 (as needed):** the category block's top questions + persistence.

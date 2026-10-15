@@ -13,7 +13,11 @@ Never restart the interview. Rebuild the context from files.
 6. If no spec exists, write `MOD-SPEC.md` from what the code does (mark it "reconstructed") before changing anything.
 
 ## Conflicts and location
-- `MOD-SPEC.md` vs `DECISIONS.md`: the newer dated entry wins; mention the conflict in the status message and
-  reconcile it in the plan (e.g. a `userConfig` default that satisfies both).
+- `MOD-SPEC.md` vs `DECISIONS.md`: the newer dated entry wins, and an undated `MOD-SPEC.md` loses to a dated
+  `DECISIONS.md` entry. Mention the conflict in the status message and reconcile it in the plan (e.g. a
+  `userConfig` default that satisfies both).
+- "Untouched example": `plugin.json` still has author `mod-forge example`, or its `name` equals one of the
+  skill's example names. Treat it as described in `workflows/improve.md` (one rename question).
+- No `README.md`: create one before the change is reported (`workflows/improve.md` step 7).
 - Status message and the next interview round can go in one message; do not change code before the answers.
 - Mod outside the projects folder and dev-mods: edit in place, load with `--plugin-dir`, and offer once to move it.

@@ -31,7 +31,10 @@ and what must never be assumed. Confirm every source in the `.d.ts` before relyi
 - **User-pressed buttons** need: a defined effect per button (ask what each does — never invent buttons), a
   busy state when Claude is working (`turn.start`/`turn.complete`), a confirmation for destructive ones, and a
   text path (`/cmd n`). Prompt buttons use `$.prompt.submit` (queued until idle) or `$.prompt.fill` (draft only).
-  At most 9 numbered hotkeys per view.
+  At most 9 numbered hotkeys per view; more actions go to a second tab, a `Select` or Tab/arrow navigation
+  (`references/ui-components.md`, "Button count"). A button the user presses that sends `$.prompt.submit`
+  **without** `asUser` is visible and framed as sent by the mod: it is not acting as the user. `asUser: true`
+  (Claude reads it as the user's own words) needs an explicit yes after explaining that.
 
 ## 4. Custom commands
 - Name? Arguments and their validation? Output (text Claude also reads, or `{}` and a pane)? Must it run while
@@ -79,7 +82,8 @@ and what must never be assumed. Confirm every source in the `.d.ts` before relyi
 - Token: `userConfig` field (`type: "string"`, `title`, `"sensitive": true`), or an env var read with
   `$.env.get('LITERAL_NAME')`. Never ask the user to paste a token into the chat.
   Never in code, tests, logs, toasts, `$.store` or text the model reads.
-- `$.http.fetch`: 30 s total, 4 MiB bodies, ≤ 5 redirects; cross-origin redirects drop `Authorization`.
+- `$.http.fetch` limits (from the docs' reference/api pages, not the .d.ts): 30 s total, 4 MiB bodies,
+  ≤ 5 redirects; cross-origin redirects drop `Authorization`.
 - Show offline/error states; back off on failure; never retry in a tight loop.
 
 ## 11. Team & corporate flows

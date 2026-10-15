@@ -55,6 +55,9 @@ last mod's `next` (a mod that answers without `next` stops them from running).
 ## Failure
 No `.catch`: failed before `next` → skipped, the chain continues (fail open); failed after `next` → its result stands.
 With `.catch(($, e, next) => next.called ? next(e) : refusal)`: fail closed.
+Inside a `.catch`, `next(e)` after the hook already called `next` resolves to the result that call produced;
+it does **not** run the tool (or the rest of the chain) a second time (official docs, "Handle a hook that
+fails"). That is why the guard and approver patterns below may call it safely.
 Refusals per event: `tool.call` `{ deny }`, `prompt.submit` `{ drop }`, `config.set` `{ deny }`,
 `tool.check` `{ decision: 'deny', reason }` (returnable even after `next`), `plugin.register` `{ refuse }`.
 `next.error.kind`: `throw` | `timeout` | `re-entry` (a call made beneath this hook's own `$` call).
@@ -62,12 +65,18 @@ Refusals per event: `tool.call` `{ deny }`, `prompt.submit` `{ drop }`, `config.
 ## Approvers are different from guards
 A `tool.check` hook that **approves** must fail to the native verdict, not to `deny` and never to `allow`:
 ```ts
-on('tool.check', { tool: 'Bash' }, async ($, e, next) => {
+on('tool.check', { tool: ['Bash', 'PowerShell'] }, async ($, e, next) => {
   const decided = await next(e)                       // what rules, mode and settings hooks decided
   if (decided.decision !== 'ask') return decided      // never turn a deny into allow
   return isOnAllowList(e.input.command) ? { decision: 'allow', reason: 'scoped allow-list' } : decided
-}).catch(($, e, next) => next(e))                     // failure → the engine's own verdict
+}).catch(($, e, next) => next(e))                     // failure → the engine's own verdict (no second run)
 ```
+- Apply the allow-list to **every** tool that runs commands (Bash, and PowerShell on Windows), or say in the
+  README which one it covers (the `scoped-approve` example covers Bash only).
+- `e.ceiling` (types: `tool.check`) is the most permissive verdict the organization lets that tool reach, set
+  by the engine; a hook's own `ceiling` is dropped. Only approve when `next(e)` said `ask`. The types do not
+  state how the engine caps a hook's `allow` at the ceiling (unverified): never rely on the ceiling to
+  undo an `allow` your mod should not have given.
 - An `allow` does not dismiss tools that need the person (questions, plan approval): "approve everything" is
   impossible by design, and the native permission modes (`acceptEdits`, `bypassPermissions`) or permission
   rules are the right tool for broad approval — recommend them before writing a mod.

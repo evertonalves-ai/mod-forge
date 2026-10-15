@@ -1,0 +1,61 @@
+name: check
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  examples:
+    runs-on: ubuntu-latest
+    env:
+      # An empty config dir: validate and the test kit need no login.
+      CLAUDE_CONFIG_DIR: ${{ runner.temp }}/claude-config
+      TYPES: ${{ runner.temp }}/claude-code.d.ts
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Claude Code
+        run: |
+          npm i -g @anthropic-ai/claude-code
+          claude --version
+          mkdir -p "$CLAUDE_CONFIG_DIR"
+
+      - name: Download the public mod types
+        run: curl -fsSL -o "$TYPES" https://raw.githubusercontent.com/anthropics/claude-code/main/mods/types/claude-code.d.ts
+
+      - name: Validate the marketplace manifest
+        run: claude plugin validate .
+
+      - name: Examples (validate + claude plugin test)
+        run: |
+          fail=0
+          for dir in skills/claude-mod-forge/examples/*/; do
+            echo "::group::$(basename "$dir")"
+            node skills/claude-mod-forge/scripts/check-mod.mjs "$dir" --types "$TYPES" --skip-tsc || fail=1
+            echo "::endgroup::"
+          done
+          exit $fail
+
+      # NON-BLOCKING on purpose. The public types file at mods/types/claude-code.d.ts was written by an older
+      # build (2.1.277 when this was added) than the one the examples target (2.1.293): it has no `atom`,
+      # `read`, `update` exports, no `Monitor` tool input, and an older test-kit signature, so strict tsc fails
+      # for reasons unrelated to the examples' code. Locally the checker type-checks against the build's own
+      # types (plugin-authoring skill or <mod>/.claude-plugin/types/) and passes. Make this step blocking once
+      # the public file catches up.
+      - name: Strict tsc against the public types (non-blocking)
+        continue-on-error: true
+        run: |
+          fail=0
+          for dir in skills/claude-mod-forge/examples/*/; do
+            echo "::group::$(basename "$dir")"
+            node skills/claude-mod-forge/scripts/check-mod.mjs "$dir" --types "$TYPES" --skip-test || fail=1
+            echo "::endgroup::"
+          done
+          exit $fail

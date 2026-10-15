@@ -10,7 +10,9 @@ what is still unknown. Pull the category questions from `references/quiz-by-cate
 Map every answer to a spec field; when a field can be filled by looking (repo, docs, `.d.ts`), look instead of asking.
 
 ## 3. Spec
-- Small (one hook, one surface, no state beyond the session, no risky capability): a 5-line plan in chat, then build.
+- Small = one hook **or** one render site, no persistence (`$.store`, files), and no capability from the matrix
+  in `references/security-review.md`: a 5-line plan in chat, then build. Anything with a pane + a command +
+  state (atoms or store) is not small: it gets the full `templates/project-spec.md`.
 - Medium/large, or anything that blocks, approves, rewrites prompts, runs processes, calls the network or a model:
   fill `templates/project-spec.md` and show it. Ask for confirmation only for decisions that change safety,
   native behaviour or project structure; otherwise go on and list the assumptions.

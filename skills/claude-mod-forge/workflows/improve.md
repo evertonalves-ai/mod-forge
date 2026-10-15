@@ -10,6 +10,8 @@
    migration that reads the old key), same `userConfig` field names, same pane ids.
 6. Bump `version` in `plugin.json` (patch for fixes, minor for features). Installed copies only update on a new version.
 7. Update `MOD-SPEC.md`, `DECISIONS.md`, `README.md` and `CHANGELOG.md` (if present) with what changed and why.
+   If the mod has no `README.md`, create it (what it does, how to load, commands/hotkeys, options, capabilities
+   used, tested version).
 8. Report: what changed, what was kept, test count before → after, anything not verified in a real session.
 
 ## Notes
@@ -18,5 +20,5 @@
   new `argumentHint`); list each such change in the report.
 - If the mod has no `MOD-SPEC.md`, write a reconstructed one (continue.md step 6) before changing code.
 - Edit the mod where it lives; do not copy it into the session mods folder.
-- A mod that is still an untouched example (example name or author) gets one question: rename now (breaks
-  store keys, pane ids, state) or keep the names.
+- A mod that is still an untouched example (author `mod-forge example`, or manifest `name` equal to an example's
+  name) gets one question: rename now (breaks store keys, pane ids, state) or keep the names.

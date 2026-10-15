@@ -37,7 +37,7 @@ No DOM, no Node, no `setTimeout`/`setInterval`: use `$.clock`. Web APIs (`URL`, 
 | `$.store` | `get`, `set`, `delete`, `keys` | JSON, 4 MiB total, shared by all sessions, not atomic |
 | `$.state` | `get`, `set` (+ helpers) | session-scoped, reactive, survives reload, reset by `/clear` |
 | `$.clock` | `now`, `sleep`, `after`, `every` | timers return `{ cancel() }`; stop on reload |
-| `$.http` | `fetch` | `{ status, ok, headers, text }`; 30 s; 4 MiB; ≤ 5 redirects |
+| `$.http` | `fetch` | `{ status, ok, headers, text }`; 30 s; 4 MiB; ≤ 5 redirects (limits from the docs, not the .d.ts) |
 | `$.process` | `run`, `spawn` | argv list, no shell; `run` → `{ exitCode, stdout, stderr, is…Truncated }`; 30 s default, rejects if it can't start |
 | `$.mcp` | `call`, `connect` | under the session's permission rules |
 | `$.audio` | `play`, `speak` | |
@@ -81,7 +81,7 @@ Hook: 10 s own time (waits inside `$` calls and `next` don't count, `$.clock.sle
 `session.end` hooks together: 1.5 s. Redraws: ≤ 10/s (30/s in terminal for the visible pane/band).
 Toast: 4 s default. Names: `[A-Za-z0-9_-]{1,64}`. Tree text: first 100,000 chars drawn. Test: 5 s each.
 The first `session.start` is awaited before the first prompt (types, `session.start`): register commands
-and tools there, but no awaited network (`$.http.fetch` can take 30 s) or `$.process.run`. Start that work
+and tools there, but no awaited network (`$.http.fetch` can take 30 s, per the docs) or `$.process.run`. Start that work
 with `void work().catch(...)` and show a loading state until it lands.
 In a fragment (`<>…</>`) children are `RenderNode` (element or string): `cond && <X/>` puts a `false` there,
 which strict tsc 5.9 rejects; pick between whole fragments or use a `Box`.

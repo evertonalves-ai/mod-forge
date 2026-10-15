@@ -17,6 +17,7 @@ const activity = atom({ plugin: 'session-dashboard', key: 'activity' } as const,
 const notes = atom({ plugin: 'session-dashboard', key: 'notes' } as const, [])
 const filter = atom({ plugin: 'session-dashboard', key: 'filter' } as const, 'all')
 const turns = atom({ plugin: 'session-dashboard', key: 'turns' } as const, [])
+const totals = atom({ plugin: 'session-dashboard', key: 'totals' } as const, { calls: 0, errors: 0, byTool: {} })
 
 // ── Persistence across sessions ($.store) ──────────────────────────────────
 const STORE_NOTES = 'notes'
@@ -47,10 +48,8 @@ function clock(ms: number): string {
   return `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`
 }
 
-function topTools(list: Activity[], n: number): [string, number][] {
-  const counts = new Map<string, number>()
-  for (const a of list) counts.set(a.tool, (counts.get(a.tool) ?? 0) + 1)
-  return [...counts.entries()].sort((a, b) => b[1] - a[1]).slice(0, n)
+function topTools(byTool: Record<string, number>, n: number): [string, number][] {
+  return Object.entries(byTool).sort((a, b) => b[1] - a[1]).slice(0, n)
 }
 
 // Helpers that take $ are top-level functions, so the validator can trace their calls.
@@ -106,12 +105,20 @@ export const register: Register = (on, options) => {
   })
 
   on('tool.call', async ($, e, next) => {
-    const item: Activity = { id: e.tool_use_id, tool: String(e.tool), at: await $.clock.now(), isDone: false, isError: false }
+    const tool = String(e.tool)
+    const item: Activity = { id: e.tool_use_id, tool, at: await $.clock.now(), isDone: false, isError: false }
     await update($, activity, list => [...list, item].slice(-300))
-    const ran = await next(e)
-    const isError = ran.deny !== undefined || ran.isError === true
-    await update($, activity, list => list.map(a => (a.id === item.id ? { ...a, isDone: true, isError } : a)))
-    return ran
+    await update($, totals, t => ({ ...t, calls: t.calls + 1, byTool: { ...t.byTool, [tool]: (t.byTool[tool] ?? 0) + 1 } }))
+    // finally: an interrupted or failing call is still marked done, never left "running" forever.
+    let isError = true
+    try {
+      const ran = await next(e)
+      isError = ran.deny !== undefined || ran.isError === true
+      return ran
+    } finally {
+      await update($, activity, list => list.map(a => (a.id === item.id ? { ...a, isDone: true, isError } : a)))
+      if (isError) await update($, totals, t => ({ ...t, errors: t.errors + 1 }))
+    }
   })
 
   // ── The pane ─────────────────────────────────────────────────────────────
@@ -123,12 +130,12 @@ export const register: Register = (on, options) => {
 
     const current = await read($, tab)
     const list = await read($, activity)
+    const sums = await read($, totals)
     const turnList = await read($, turns)
     const noteList = await read($, notes)
     const currentFilter = await read($, filter)
 
     const running = list.filter(a => !a.isDone).length
-    const errors = list.filter(a => a.isError).length
     const avgTurn = turnList.length === 0 ? 0 : Math.round(turnList.reduce((s, n) => s + n, 0) / turnList.length)
 
     const header = (
@@ -161,13 +168,13 @@ export const register: Register = (on, options) => {
 
     let body
     if (current === 'overview') {
-      const top = topTools(list, 5)
+      const top = topTools(sums.byTool, 5)
       const topMax = top[0]?.[1] ?? 1
       body = (
         <Box flexDirection="column" gap={1}>
           <Box gap={1} flexWrap="wrap">
-            {kpi('kpi-tools', t.kpiTools, String(list.length), 'text')}
-            {kpi('kpi-errors', t.kpiErrors, String(errors), errors > 0 ? 'error' : 'success')}
+            {kpi('kpi-tools', t.kpiTools, String(sums.calls), 'text')}
+            {kpi('kpi-errors', t.kpiErrors, String(sums.errors), sums.errors > 0 ? 'error' : 'success')}
             {kpi('kpi-turns', t.kpiTurns, String(turnList.length), 'text')}
             {kpi('kpi-avg', t.kpiAvg, `${avgTurn}s`, avgTurn > 120 ? 'warning' : 'text')}
           </Box>
@@ -181,7 +188,7 @@ export const register: Register = (on, options) => {
             {top.map(([name, count]) => (
               <Box key={`top-${name}`} gap={1}>
                 <Box width={12}><Text wrap="truncate-end">{name}</Text></Box>
-                <Text color="suggestion">{meter(count / topMax, Math.max(6, width - 22))}</Text>
+                <Box flexGrow={1}><Text color="suggestion" wrap="truncate-end">{meter(count / topMax, Math.max(6, width - 24))}</Text></Box>
                 <Text dimColor>{String(count)}</Text>
               </Box>
             ))}
@@ -189,7 +196,7 @@ export const register: Register = (on, options) => {
         </Box>
       )
     } else if (current === 'activity') {
-      const tools = ['all', ...topTools(list, 8).map(([name]) => name)]
+      const tools = ['all', ...topTools(sums.byTool, 8).map(([name]) => name)]
       const shown = list.filter(a => currentFilter === 'all' || a.tool === currentFilter).slice(-rows)
       body = (
         <Box flexDirection="column" gap={1}>
