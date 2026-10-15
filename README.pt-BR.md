@@ -57,7 +57,7 @@ padrões sensatos e anota cada um como premissa.
 
 Como plugin, num terminal do Claude Code:
 ```
-/plugin install mod-forge@ReborNLtO/claude-mod-forge
+/plugin install mod-forge@evertonalves-ai/claude-mod-forge
 ```
 O repositório é privado, então sua conta do GitHub precisa ter acesso.
 

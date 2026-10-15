@@ -22,14 +22,14 @@ The skill inside it is `claude-mod-forge`.
 
 As a plugin, from this repository (at a Claude Code prompt in a terminal):
 ```
-/plugin install mod-forge@ReborNLtO/claude-mod-forge
+/plugin install mod-forge@evertonalves-ai/claude-mod-forge
 ```
 Accept the marketplace when asked, then pick a scope (user is the usual choice). The repository is private, so
 your GitHub account needs access to it.
 
 Or as a personal skill, from a clone:
 ```bash
-git clone https://github.com/ReborNLtO/claude-mod-forge.git
+git clone https://github.com/evertonalves-ai/claude-mod-forge.git
 # macOS / Linux
 ln -s "$PWD/claude-mod-forge/skills/claude-mod-forge" ~/.claude/skills/claude-mod-forge
 # Windows (PowerShell), a junction needs no admin rights
