@@ -1,14 +1,14 @@
 {
   "name": "scoped-approve",
   "version": "0.1.0",
-  "description": "Approves without asking only the shell commands on an exact allow-list; never overrides a deny, never touches subagents",
+  "description": "Approves without asking only the shell commands on an exact allow-list (arguments only where an entry ends in *); never overrides a deny, never touches subagents",
   "author": { "name": "mod-forge example" },
   "types": "./types/index.d.ts",
   "userConfig": {
     "allowList": {
       "type": "string",
       "title": "Allowed commands",
-      "description": "Comma-separated. Each entry matches the command exactly or followed by arguments, e.g. git status, npm test",
+      "description": "Comma-separated. An entry matches only the identical command; end it with a space and * to also accept arguments, e.g. git status, npm test *",
       "default": ""
     },
     "enabled": {

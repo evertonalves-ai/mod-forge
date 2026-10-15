@@ -46,14 +46,16 @@ export const register: Register = (on, options) => {
   const seconds = Number(options.refreshSeconds ?? 0)
   const interval = seconds > 0 ? Math.max(15, seconds) * 1000 : 0 // never poll faster than every 15 s
 
+  // The first session.start is awaited before the first prompt: no awaited network here. Register the
+  // command, then let the first fetch run on its own (the band shows "loading" until it lands).
   on('session.start', async ($, e, next) => {
-    await refresh($, config)
-    if (interval > 0) $.clock.every(interval, () => refresh($, config))
     try {
       await $.command.register({ name: 'api-status', description: 'Refresh the API status band (and show it if hidden)', immediate: true })
     } catch {
       // name taken: the band and its r button still work
     }
+    void refresh($, config).catch(() => undefined)
+    if (interval > 0) $.clock.every(interval, () => refresh($, config))
     return next(e)
   })
 
@@ -79,13 +81,21 @@ export const register: Register = (on, options) => {
     if (now.kind === 'ok') {
       status = <><Text color="success">●</Text><Text bold>{now.value}</Text><Text dimColor>{clock(now.at)}</Text></>
     } else if (now.kind === 'error') {
-      status = (
-        <>
-          <Text color="error">✗ unavailable</Text>
-          <Text dimColor>{now.reason}</Text>
-          {now.lastValue !== undefined && <Text dimColor>· last {now.lastValue}{now.lastAt === undefined ? '' : ` at ${clock(now.lastAt)}`}</Text>}
-        </>
-      )
+      // A fragment's children are RenderNode (element or string): `cond && <X/>` there yields a false,
+      // which strict tsc 5.9 rejects. Pick between two whole fragments instead.
+      status =
+        now.lastValue === undefined ? (
+          <>
+            <Text color="error">✗ unavailable</Text>
+            <Text dimColor>{now.reason}</Text>
+          </>
+        ) : (
+          <>
+            <Text color="error">✗ unavailable</Text>
+            <Text dimColor>{now.reason}</Text>
+            <Text dimColor>· last {now.lastValue}{now.lastAt === undefined ? '' : ` at ${clock(now.lastAt)}`}</Text>
+          </>
+        )
     } else if (now.kind === 'unconfigured') {
       status = <Text color="warning">{now.reason}</Text>
     } else {

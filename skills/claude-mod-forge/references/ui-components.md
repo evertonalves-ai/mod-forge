@@ -20,7 +20,7 @@ To see what a hook really drew, print `JSON.stringify(await ui.drawn())` in a ki
 ## Sites
 | Site | Use | Draws on |
 |---|---|---|
-| `Pane` (`requestId` = your id) | rich, persistent UI; width `e.props.bodyColumns`, height `e.props.scroll.bodyRows` | terminal, desktop |
+| `Pane` (`requestId` = your id) | rich, persistent UI; width `e.props.bodyColumns`, height `e.props.scroll.bodyRows` | every surface (types); seen drawing on terminal and desktop, VS Code unconfirmed (`surfaces.md`) |
 | `AbovePrompt` | one shared band above the prompt; return `next(e)` when idle; respect `e.props.hasSurvey` | terminal, desktop |
 | `UserMessage`, `AssistantMessage`, `ToolUse`, `ToolResult`, `ToolGroup`, `CommandOutput`, `AskUserQuestion` | restyle native UI | every surface (types) |
 | `Spinner`, `SessionMode`, `PromptHint` | restyle native UI | terminal, desktop |
@@ -43,9 +43,9 @@ Not a site: the permission prompt.
 | `Text` | `color`, `backgroundColor`, `bold`, `dimColor`, `italic`, `underline`, `inverse`, `wrap` | all |
 | `Button` | `key`, `label`, `onPress`, `hotkey` (1 digit or lowercase letter), `plain`, `variant` (`primary`/`secondary`), `role: 'dismiss'`, `dimColor`, `autoFocus: true`, `action` | all |
 | `Link`, `Code`, `Markdown` | `href`/`label`; `source`/`language`/`format: 'diff'`; `text` (not children) | all |
-| `Input` | `key`, `label`, `placeholder`, `value`, `submitLabel`, `onSubmit(value)`, `onInput(value)` | terminal, desktop |
-| `Select` | `key`, `label`, `options: {value,label?}[]` (≥1, unique), `value`, `onSelect(value)` | terminal, desktop |
-| `Svg` | SVG source ≤ 131,072 chars | desktop |
+| `Input` | `key`, `label`, `placeholder`, `value`, `submitLabel`, `onSubmit(value)`, `onInput(value)` | terminal, desktop, vscode |
+| `Select` | `key`, `label`, `options: {value,label?}[]` (≥1, unique), `value`, `onSelect(value)` | terminal, desktop, vscode |
+| `Svg` | SVG source ≤ 131,072 chars | desktop, mobile, vscode |
 | `Raster`, `Image` | cell grid (`columns ≤ 512`, `rows ≤ 256`, base64 cells) / picture | terminal |
 | `Client` | a separate module for animation/pointer input | terminal, desktop |
 Boolean "flag" props (`focus`, `closeOnEscape`, `holdToasts`, `autoFocus`) accept only `true`: omit them otherwise.

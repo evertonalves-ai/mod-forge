@@ -80,6 +80,11 @@ A timer callback that throws is logged and runs again next interval. Long work i
 Hook: 10 s own time (waits inside `$` calls and `next` don't count, `$.clock.sleep` does). `.catch`: 1 s.
 `session.end` hooks together: 1.5 s. Redraws: ≤ 10/s (30/s in terminal for the visible pane/band).
 Toast: 4 s default. Names: `[A-Za-z0-9_-]{1,64}`. Tree text: first 100,000 chars drawn. Test: 5 s each.
+The first `session.start` is awaited before the first prompt (types, `session.start`): register commands
+and tools there, but no awaited network (`$.http.fetch` can take 30 s) or `$.process.run`. Start that work
+with `void work().catch(...)` and show a loading state until it lands.
+In a fragment (`<>…</>`) children are `RenderNode` (element or string): `cond && <X/>` puts a `false` there,
+which strict tsc 5.9 rejects; pick between whole fragments or use a `Box`.
 
 ## Facts that change designs (verified against types, docs or validate)
 - **Limits come from different sources.** Hook budgets, `$.fs` 4 MiB, `$.store` 4 MiB and the `$.process` 30 s

@@ -1,18 +1,18 @@
 # Test results — v0.1.0 (2026-10-14), examples updated in v0.2.0 (2026-10-15)
 
-Environment: Windows 10, Claude Code CLI 2.1.294, mods API types 2.1.293, Node 24, TypeScript 5.6.3 (npx).
+Environment: Windows 10, Claude Code CLI 2.1.294, mods API types 2.1.293, Node 24, TypeScript 5.9.3 (npx; 5.6.3 before the round-1 review fixes).
 
 ## 1. Reference mods (structural + types + kit), after the fixes below
 | Example | validate | strict tsc | `claude plugin test` |
 |---|---|---|---|
 | session-dashboard | pass | pass | 4/4 |
 | context-band | pass | pass | 3/3 |
-| shell-guard | pass | pass | 8/8 |
+| shell-guard | pass | pass | 14/14 |
 | git-recap | pass | pass | 6/6 |
 | spinner-counter | pass | pass | 1/1 |
-| scoped-approve (0.2.0) | pass | pass | 7/7 |
-| api-status (0.2.0) | pass | pass | 6/6 |
-| tool-log (0.2.0) | pass | pass | 6/6 |
+| scoped-approve (0.2.0) | pass | pass | 8/8 |
+| api-status (0.2.0) | pass | pass | 7/7 |
+| tool-log (0.2.0) | pass | pass | 16/16 |
 | prompt-buttons (0.2.0) | pass | pass | 6/6 |
 | context-chart (0.2.0) | pass | pass | 4/4 |
 | plugin `mod-forge` manifest + marketplace | pass | — | — |
@@ -36,7 +36,7 @@ AskUserQuestion, so they wrote the questions out and assumed the recommended ans
 | F improve | pass 4/4 | baseline with the checker, kept every message and export, 6→12 tests planned, 0.1.0→0.2.0 |
 | G terminal + VS Code | pass 3/3 | split behaviour vs drawing, text path as the guaranteed route, kit tests on vscode too |
 | H external API | pass 4/4 | asked auth/data/refresh, token as sensitive `userConfig`, host only from config, offline state, no retry loop |
-| I approve everything | pass 4/4 | asked the goal, explained the risk, refused a broad allow, proposed an exact allow-list that only turns `ask` into `allow` |
+| I approve everything | pass 4/4 | asked the goal, explained the risk, refused a broad allow, proposed an exact allow-list that only turns `ask` into `allow` (the example now matches exactly; an entry accepts arguments only with a trailing ` *`) |
 | J continue | pass 3/3 | read MOD-SPEC/DECISIONS/code/tests, ran the checker, status + next step, one interview round only for what files did not say |
 
 ## 3. Defects found by the run, and what changed
@@ -65,3 +65,26 @@ regression (section 1), not by re-running the ten agents.
 for d in examples/*/; do m=$(basename $d); node scripts/check-mod.mjs examples/$m || exit 1; done
 claude plugin validate ../..
 ```
+
+## 5. Critic / builder rounds (v0.3.0, 2026-10-15)
+Two local agents reviewed the skill: "critic" (read-only) and "builder" (edits), talking through a shared log
+shown live by the agent-dialogue mod. Round 1: critic filed 10 findings with evidence. Builder applied 9 and
+part of 1, each with a test that fails on the previous code. Round 2: critic re-ran its reproductions on scratch
+copies, verified 9 and reopened 1 (low). The orchestrator closed the reopened item and the critic's minor notes:
+a pure, tested fail-closed answer for the shell-guard .catch; quote-glued rm flags and quoted +refspecs;
+redaction no longer hides non-secrets (monkey:, tokenizer:, https://keycloak:8443, -u 1000:1000).
+
+| Finding | Severity | Result |
+|---|---|---|
+| write-containment helper bypassable (symlinked parent, sibling prefix) | high | fixed (d.ts placed() pattern) |
+| tool-log could overwrite part1 after reload/resume | high | fixed, test fails on old code |
+| checker ignored claude-code-tools in laid-out types | high | fixed (whole folder; TypeScript 5.9.3) |
+| checker broke on Windows paths with spaces; silent ENOENT | high | fixed |
+| scoped-approve "exact" list accepted any arguments | medium | fixed: exact by default, trailing " *" opts in |
+| api-status awaited a network call in session.start | medium | fixed + rule in mods-api.md |
+| tool-log redaction leaks (curl -u, X-Api-Key, mysql -p, docker -p, AKIA) | medium | fixed, one test each |
+| tool-log rolled by characters, limits are bytes | medium | fixed (TextEncoder, stat size) |
+| shell-guard fail-closed untested; rm/refspec spellings | medium | fixed (reopened once, closed by orchestrator) |
+| docs: surface tables, dead reference, store expiry claim | low | fixed |
+
+Totals after the rounds: 10/10 examples green, 69 kit tests.

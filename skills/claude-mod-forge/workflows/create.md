@@ -41,7 +41,8 @@ Keep pure logic (rules, parsing, formatting) in its own file with no `$`, so tes
 
 ## 6. Verify
 `node scripts/check-mod.mjs <mod>` until green. Then `workflows/test.md` for the session-level checks.
-Run `workflows/audit.md` when the mod uses any capability in the "review" column of `references/security-review.md`.
+Run `workflows/audit.md` when the mod uses any capability listed in the capability matrix of
+`references/security-review.md` (its "Capability (validate line)" column; match it against the validate output).
 
 ## 7. Deliver
 Hot reload loads it when the turn ends (if the user enabled it). Then copy it to the user's projects folder and

@@ -79,9 +79,9 @@ Start from the closest example in `examples/` (rename `_claude-plugin` → `.cla
 | `shell-guard` | Guard on every command tool (Bash, PowerShell, Monitor), `$.ui.ask` hold-and-confirm, `userConfig` mode (ask/block/off), fail-closed `.catch`, pure rules module, Windows paths |
 | `git-recap` | `/command` with `argumentHint`, argument validation, `$.process.run` argv, error paths |
 | `spinner-counter` | Restyling a native site (`Spinner`) with `next({ ...e, props })`, per-turn state |
-| `scoped-approve` | `tool.check` approver: only `ask` → `allow` for an exact allow-list, never over a deny, subagents untouched, falls back to the native verdict |
+| `scoped-approve` | `tool.check` approver: only `ask` → `allow` for an exact allow-list (arguments only where an entry ends in ` *`), never over a deny, subagents untouched, falls back to the native verdict |
 | `api-status` | `$.http.fetch` to a configured https host, token as `sensitive` userConfig, offline state keeping the last value, optional timer ≥ 15 s |
-| `tool-log` | Observer writing redacted JSONL with `$.fs` (no append: serialised read-modify-write, file rolling, flush per turn), `directory` userConfig |
+| `tool-log` | Observer writing redacted JSONL with `$.fs` (no append: serialised read-modify-write, file rolling by bytes, flush per turn), best-effort regex redaction, `directory` userConfig |
 | `prompt-buttons` | User-defined buttons in `$.store` (one key each), `$.prompt.submit` scheduled out of `command.run`, busy state, text path for VS Code |
 | `context-chart` | Data pushed by `session.measure`; one data layer, two renderings: `Svg` on desktop, text bars on the terminal, picked by `e.surface` |
 

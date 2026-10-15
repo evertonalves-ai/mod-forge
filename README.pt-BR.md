@@ -46,7 +46,7 @@ padrões sensatos e anota cada um como premissa.
 
 ## O que vem junto
 
-- 10 mods de exemplo que passam em validação, checagem de tipos e testes (51 no total): painel com abas, faixa
+- 10 mods de exemplo que passam em validação, checagem de tipos e testes (69 no total): painel com abas, faixa
   com o uso do contexto, guarda de comandos perigosos (Bash e PowerShell), comando `/recap`, personalização do
   spinner, aprovação automática restrita a uma lista, consulta a uma API com token seguro, log de ferramentas em
   arquivo, painel de botões que enviam prompts e gráfico de contexto em SVG no app desktop.

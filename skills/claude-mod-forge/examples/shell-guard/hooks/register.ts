@@ -1,6 +1,6 @@
 import type { Register } from 'claude-code'
 
-import { isSecretPath, riskOf } from './rules'
+import { failureAnswer, isSecretPath, riskOf } from './rules'
 
 // Every guard here fails CLOSED: if the hook throws or times out before deciding,
 // the .catch handler refuses. A guard without .catch would let the command through.
@@ -31,11 +31,11 @@ export const register: Register = (on, options) => {
     }
     // Approved here only means "go on": the normal permission check still runs after next().
     return next(e)
-  }).catch(($, e, next) => (next.called ? next(e) : { deny: `${$.plugin.name}: the check failed, so the command was not run.` }))
+  }).catch(($, e, next) => failureAnswer($.plugin.name, next.called, 'command') ?? next(e))
 
   on('tool.call', { tool: ['Edit', 'Write'] }, ($, e, next) =>
     mode !== 'off' && isSecretPath(e.file_path)
       ? { deny: `${$.plugin.name}: ${e.file_path} holds secrets and is not edited by Claude here.` }
       : next(e),
-  ).catch(($, e, next) => (next.called ? next(e) : { deny: `${$.plugin.name}: the check failed, so the edit was not made.` }))
+  ).catch(($, e, next) => failureAnswer($.plugin.name, next.called, 'edit') ?? next(e))
 }

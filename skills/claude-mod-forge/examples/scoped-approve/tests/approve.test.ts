@@ -4,7 +4,7 @@ import { expect, mock, test } from 'claude-code/testing'
 import { allowedBy, parseList } from '../hooks/allow'
 
 const TYPED = { origin: { kind: 'composer' }, presentation: { isFullscreen: true, columns: 120 } } as const
-const LIST = { options: { allowList: 'git status, npm test' } }
+const LIST = { options: { allowList: 'git status *, npm test' } }
 
 // Stands in for Claude Code's own permission decision.
 function engine(on: On, decision: 'allow' | 'ask' | 'deny') {
@@ -12,15 +12,22 @@ function engine(on: On, decision: 'allow' | 'ask' | 'deny') {
   on('ui.log', () => ({ value: undefined }))
 }
 
-test('rules: exact or with arguments, never compound', () => {
-  const list = parseList(' git status ,npm test,, rm -rf x; ls ')
-  expect(list).toEqual(['git status', 'npm test'])
-  expect(allowedBy('git status', list)).toBe('git status')
-  expect(allowedBy('git status --short', list)).toBe('git status')
+test('rules: exact by default, arguments only with a trailing *, never compound', () => {
+  const list = parseList(' git status * ,npm test,, rm -rf x; ls , * , git * diff ')
+  expect(list).toEqual(['git status *', 'npm test'])
+  expect(allowedBy('git status', list)).toBe('git status *')
+  expect(allowedBy('git status --short', list)).toBe('git status *')
   expect(allowedBy('git statusx', list)).toBeUndefined()
   expect(allowedBy('git status && rm -rf /', list)).toBeUndefined()
   expect(allowedBy('npm test | tee out', list)).toBeUndefined()
   expect(allowedBy('echo $(whoami)', list)).toBeUndefined()
+})
+
+test('rules: an entry without * never approves the command with arguments', () => {
+  const list = parseList('git diff, npm test')
+  expect(allowedBy('git diff', list)).toBe('git diff')
+  expect(allowedBy('git diff --output=C:/any/file', list)).toBeUndefined()
+  expect(allowedBy('npm test -- --updateSnapshot', list)).toBeUndefined()
 })
 
 test('an allow-listed command that would ask is approved and logged', LIST, async ($, on) => {

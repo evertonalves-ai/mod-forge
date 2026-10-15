@@ -4,7 +4,7 @@
 |---|---|---|
 | module variable | the module reloads (every save in development) | values you can lose: a turn's start time, caches |
 | `$.state` (atoms) | session ends, or `/clear` · `/resume` · `/branch` | anything a drawing reads; survives hot reload; redraws readers |
-| `$.store` | deleted, or unused for `cleanupPeriodDays` | settings, history, notes the user expects next session |
+| `$.store` | the mod deletes the key (neither the types nor the docs state an expiry; unverified) | settings, history, notes the user expects next session |
 | files via `$.fs` | forever | large or user-visible data (4 MiB per read/write, not atomic) |
 | `userConfig` | the user changes it | options and secrets (`"sensitive": true` → secure storage) |
 | external service | — | shared/team data; handle offline |

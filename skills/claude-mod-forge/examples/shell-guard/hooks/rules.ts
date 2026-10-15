@@ -7,8 +7,15 @@
 export type Risk = { label: string; why: string }
 
 const RISKS: { pattern: RegExp; label: string; why: string }[] = [
-  { pattern: /\brm\s+(-[a-z]*r[a-z]*f|-[a-z]*f[a-z]*r)\b/i, label: 'recursive force delete', why: 'deletes files with no undo' },
-  { pattern: /\bgit\s+push\b.*(--force\b|--force-with-lease\b|\s-f\b)/i, label: 'force push', why: 'rewrites shared history' },
+  // rm with a recursive AND a force flag, in any order or spelling, within the same command:
+  // -rf, -fr, -r -f, -f -r, -R -f, --recursive --force; a flag may touch a quote: rm -rf"$DIR".
+  {
+    pattern: /\brm\b(?=[^|;&\n]*\s(?:-[a-zA-Z]*[rR][a-zA-Z]*|--recursive)(?=[\s"']|$))(?=[^|;&\n]*\s(?:-[a-zA-Z]*f[a-zA-Z]*|--force)(?=[\s"']|$))/,
+    label: 'recursive force delete',
+    why: 'deletes files with no undo',
+  },
+  // --force, --force-with-lease, -f, or a +refspec, quoted or not (git push origin "+main" forces that branch).
+  { pattern: /\bgit\s+push\b.*(--force\b|--force-with-lease\b|\s-f\b|\s["']?\+[^\s+"'])/i, label: 'force push', why: 'rewrites shared history' },
   { pattern: /\bgit\s+reset\s+--hard\b/i, label: 'hard reset', why: 'drops uncommitted work' },
   { pattern: /\bgit\s+clean\s+-[a-z]*f/i, label: 'git clean', why: 'deletes untracked files' },
   { pattern: /\b(drop|truncate)\s+(table|database|schema)\b/i, label: 'destructive SQL', why: 'removes data' },
@@ -30,4 +37,12 @@ const SECRET_FILE = /(^|[\\/])(\.env(\.[\w-]+)?|id_(rsa|ed25519)(\.pub)?|[^\\/]+
 
 export function isSecretPath(path: string): boolean {
   return SECRET_FILE.test(path)
+}
+
+// What the guards' .catch answers. Kept pure so the fail-closed decision is tested directly:
+// before next() was called the guard refuses (undefined would let the call through);
+// after next() it hands back what that call already settled to (the caller returns next(e)).
+export function failureAnswer(plugin: string, nextWasCalled: boolean, what: 'command' | 'edit'): { deny: string } | undefined {
+  if (nextWasCalled) return undefined
+  return { deny: `${plugin}: the check failed, so the ${what === 'command' ? 'command was not run' : 'edit was not made'}.` }
 }

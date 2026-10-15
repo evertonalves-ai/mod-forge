@@ -73,4 +73,6 @@ on('tool.check', { tool: 'Bash' }, async ($, e, next) => {
   rules are the right tool for broad approval — recommend them before writing a mod.
 - Only approve when `next(e)` said `ask`; reject compound shell commands (`;`, `&&`, `|`, `$(`, backticks,
   redirections) from allow-lists so `git status && rm -rf x` cannot ride along.
+- Match allow-list entries exactly by default and accept arguments only where the entry asks for it (a
+  trailing ` *`): arguments change what a command does (`git diff --output=FILE` overwrites a file).
 - Deny rules hold over user mods where the built-in guard loads (docs, admin page); do not rely on that in code.

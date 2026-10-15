@@ -81,6 +81,27 @@ test('plain http to a remote host is refused before any request', { options: { u
   expect(seen).toEqual([])
 })
 
+test('session.start registers the command and returns without waiting for the API', CONFIG, async ($, on) => {
+  mock.clock(on, { now: 1_700_000_000_000 })
+  const order: string[] = []
+  let release: () => void = () => undefined
+  on('session.start', () => ({ cwd: '/work' }))
+  on('command.register', ($, e) => {
+    order.push(`register ${e.name}`)
+    return { value: { command: e.name } }
+  })
+  // A slow API: the fetch stays pending until the test releases it.
+  on('http.fetch', () => {
+    order.push('fetch')
+    return new Promise(resolve => {
+      release = () => resolve({ value: { status: 200, ok: true, headers: {}, text: '{"data":{"state":"green"}}' } })
+    })
+  })
+  await $.session.start({ surface: 'terminal', isInteractive: true, cwd: '/work' })
+  expect(order).toEqual(['register api-status', 'fetch']) // returned while the fetch is still pending
+  release()
+})
+
 test('hide, then /api-status brings the band back', CONFIG, async ($, on) => {
   mock.clock(on)
   http(on, [{ status: 200, text: '{"data":{"state":"green"}}' }, { status: 200, text: '{"data":{"state":"green"}}' }])

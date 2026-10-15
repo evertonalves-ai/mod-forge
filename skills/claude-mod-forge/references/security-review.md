@@ -45,13 +45,40 @@ logging; no personal data in URLs or query strings; encrypt at rest when it leav
 Fill `templates/security-review.md`. List the capabilities in the README's "What this mod can reach" section.
 
 ## Path containment for writes (including files that do not exist yet)
+Follows the `placed` example under `fs.stat` in the `.d.ts`: stat the path itself; when it is not there
+yet, resolve its parent folder and append the name; then require the result to equal the project root or
+to start with `ROOT + SEP`. Returns where the path really lands, or `undefined` (deny).
 ```ts
-async function insideProject($: EngineInterface, relDir: string): Promise<string | undefined> {
-  if (relDir.includes('..') || /^([a-zA-Z]:|[\\/])/.test(relDir)) return undefined   // relative only
-  const root = (await $.fs.stat('.', { resolve: true })).realPath
-  const probe = (await $.fs.exists(relDir)) ? relDir : '.'              // resolve the parent when new
-  const real = (await $.fs.stat(probe, { resolve: true })).realPath
-  return real && root && real.startsWith(root) ? relDir : undefined
+async function insideProject($: EngineInterface, path: string): Promise<string | undefined> {
+  const rawRoot = (await $.fs.stat('.', { resolve: true }).catch(() => undefined))?.realPath
+  if (rawRoot === undefined) return undefined
+  const SEP = rawRoot.includes('\\') ? '\\' : '/'
+  const ROOT = rawRoot.replace(/[\\/]$/, '')
+  const cut = Math.max(path.lastIndexOf('/'), path.lastIndexOf('\\'))
+  const name = path.slice(cut + 1)
+  // Unplaceable by spelling, no file system call: drive-relative D:x, a \\ or // network/device path,
+  // a name that is empty, ".", ".." or itself C:-shaped.
+  const isPlaceable = !/^[A-Za-z]:(?![\\/])/.test(path) && !/^[\\/][\\/]/.test(path) &&
+    !/^[A-Za-z]:/.test(name) && name !== '' && name !== '.' && name !== '..'
+  if (!isPlaceable) return undefined
+  const own = await $.fs.stat(path, { resolve: true }).catch(() => undefined)
+  let real = own?.realPath
+  if (own === undefined) {                                   // not there yet: place it by its real parent
+    const folder = cut < 0 ? '.' : path.slice(0, cut + 1)
+    const dir = await $.fs.stat(folder, { resolve: true }).catch(() => undefined)
+    real = dir?.realPath === undefined ? undefined : `${dir.realPath.replace(/[\\/]$/, '')}${SEP}${name}`
+  }
+  if (real === undefined) return undefined                   // missing parent or unresolvable spelling
+  return real === ROOT || real.startsWith(ROOT + SEP) ? real : undefined
 }
 ```
-Grep `stat:` in the `.d.ts` for the exact `realPath` result shape of your build before using this.
+Why each part is there:
+- **Symlink out.** `sub` is a symlink or junction to `C:\elsewhere` and `sub/new.txt` does not exist yet.
+  Checking the project root instead of the real parent would pass; resolving `sub/` gives `C:\elsewhere`,
+  which fails.
+- **Sibling prefix.** A bare `startsWith(ROOT)` accepts `C:\proj-evil\x` for the root `C:\proj`; comparing
+  with `ROOT + SEP` (or equality) does not.
+- **Missing parent.** A folder that does not exist resolves to nothing and is denied; create folders in a
+  separate, separately checked step.
+- Still best effort against hard links and case aliases (the `.d.ts` says so); an allow-list of folders
+  under the root is the robust form. Grep `stat:` in the `.d.ts` for the `realPath` shape of your build.

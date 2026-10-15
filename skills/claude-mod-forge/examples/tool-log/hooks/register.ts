@@ -1,6 +1,6 @@
 import type { EngineInterface, Register } from 'claude-code'
 
-import { fileName, redact, shouldRoll, summarize } from './entry'
+import { byteLength, fileName, redact, shouldRoll, summarize } from './entry'
 import type { Entry } from './entry'
 
 // An OBSERVER: it never changes or blocks a tool call, and has no .catch, so a failure here
@@ -13,6 +13,7 @@ let target: Target | undefined
 let queue: Entry[] = []
 let chain: Promise<void> = Promise.resolve()
 let hasWarned = false
+const MAX_PARTS_PER_FLUSH = 50
 
 async function writeQueued($: EngineInterface) {
   if (target === undefined || queue.length === 0) return
@@ -20,12 +21,34 @@ async function writeQueued($: EngineInterface) {
   queue = []
   const add = batch.map(e => JSON.stringify(e)).join('\n') + '\n'
   try {
+    // Find the part to append to. After a reload or resume `part` starts again at 0, so walk past every
+    // part that already exists and is full, and always read what the chosen part holds: never assume
+    // a new part is empty. A part that cannot be read is skipped, never overwritten.
+    const addBytes = byteLength(add)
     let path = fileName(target.dir, target.sessionId, target.startedAt, target.part)
-    let current = (await $.fs.exists(path)) ? await $.fs.read(path) : ''
-    if (shouldRoll(current.length, add.length)) {
-      target.part += 1
+    let current = ''
+    for (let tries = 0; ; tries += 1) {
+      if (tries > MAX_PARTS_PER_FLUSH) throw new Error('no writable log part')
       path = fileName(target.dir, target.sessionId, target.startedAt, target.part)
-      current = ''
+      if (!(await $.fs.exists(path))) {
+        current = ''
+        break
+      }
+      const size = (await $.fs.stat(path)).size
+      if (shouldRoll(size, addBytes)) {
+        target.part += 1
+        continue
+      }
+      const read = await $.fs.read(path).then(
+        text => ({ text }),
+        () => undefined,
+      )
+      if (read === undefined) {
+        target.part += 1 // unreadable (e.g. over the 4 MiB read limit): leave it as it is, move on
+        continue
+      }
+      current = read.text
+      break
     }
     await $.fs.write(path, current + add)
   } catch (error) {
@@ -52,8 +75,9 @@ export const register: Register = (on, options) => {
       $.ui.toast('tool-log: choose a log folder in /config to start logging')
     }
     if (isEnabled) {
-      // A reload keeps the same session id and day, so it continues the same file.
-      target = { dir, sessionId: await $.session.id(), startedAt: await $.clock.now(), part: target?.part ?? 0 }
+      // A reload or resume keeps the same session id and day: start again at part 0 and let the
+      // writer walk past the parts that are already full, so no part is ever overwritten.
+      target = { dir, sessionId: await $.session.id(), startedAt: await $.clock.now(), part: 0 }
     }
     return next(e)
   })
