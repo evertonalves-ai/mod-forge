@@ -42,7 +42,7 @@ function engine(on: On, script: Script = {}, store: Record<string, unknown> = {}
     if (call.prompt.includes('Pick the pair')) return answer('user-eng | An app has to balance what people want with what can be built.')
     if (call.prompt.includes('Summarize this round')) return answer('Decided: the budget bar\nOpen: bank import')
     if (call.system.includes('turn a design dialogue')) {
-      return answer('# Budget bar\n\n## The idea in one sentence\n\nA spending app whose budget empties like a bar.\n\n## First steps\n\n- Sketch the bar')
+      return answer('# Budget bar\n\n> A spending app whose budget empties like a bar.\n\n## In short\n\n- **For** people aged 18 to 25\n- Start with a sketch\n\n## First steps\n\n- [ ] Sketch the bar')
     }
     if (call.system.includes('check that a document')) return answer(`OK\nMOD: ${script.mod ?? 'no'}`)
     const side = call.system.includes('You are side A') ? 'A' : 'B'
@@ -104,9 +104,10 @@ test('a whole conversation: suggestion, accept, rounds with a comment, document 
   expect(round2?.prompt).toContain('Round 2 of at most 2. You are side A.')
 
   expect(await ui.find({ text: /^Saved: .*ideia\.md$/ })).toBeDefined()
+  expect(await ui.find({ text: 'A spending app whose budget empties like a bar.\n• For people aged 18 to 25\n• Start with a sketch' })).toBeDefined()
   const doc = files.get(`${DIR}/ideia.md`) ?? ''
   expect(doc.startsWith('# Budget bar')).toBe(true)
-  expect(doc).toContain('## How the conversation went\n\n- Round 1: User × Engineering\n- Round 2: User × Engineering')
+  expect(doc).toContain('## How the conversation went\n\n**Round 1 · User × Engineering**\n- Decided: the budget bar\n- Open: bank import\n\n**Round 2 · User × Engineering**')
   expect(doc).toContain('- focus on people aged 18 to 25')
   expect(saved().map(e => e.type)).toEqual(['start', 'pair', 'msg', 'msg', 'msg', 'summary', 'comment', 'msg', 'msg', 'msg', 'summary', 'doc'])
 
@@ -163,7 +164,7 @@ test('finish at a round end writes the document from what exists', WITH({ rounds
   await ui.press({ key: 'finish' })
   await clock.settle()
   expect(sides()).toHaveLength(3)
-  expect(files.get(`${DIR}/ideia.md`)).toContain('- Round 1: User × Engineering')
+  expect(files.get(`${DIR}/ideia.md`)).toContain('**Round 1 · User × Engineering**')
 })
 
 test('change pair at a round end: round 2 thinks with the new pair', WITH(), async ($, on) => {
@@ -264,7 +265,7 @@ test('finish now while a side is thinking writes the document from what exists',
   // The engine resolves an aborted call as "aborted"; this stub's own wait is the test's, so let it end.
   await clock.advance(60_000)
   expect(saved().filter(e => e.type === 'msg').length).toBeLessThanOrEqual(2)
-  expect(files.get(`${DIR}/ideia.md`)).toContain('- Round 1: User × Engineering')
+  expect(files.get(`${DIR}/ideia.md`)).toContain('**Round 1 · User × Engineering**')
   expect(await ui.find({ text: /^Saved:/ })).toBeDefined()
 })
 

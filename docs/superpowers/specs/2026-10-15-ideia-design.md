@@ -111,9 +111,13 @@ Each conversation gets `<folder>/<YYYY-MM-DD>-<slug>/` (slug: the idea's first w
   `start {idea}`, `pair {round, pair}`, `msg {side, round, text, status}` (also carrying `from`, `to`, `kind`,
   `text`, `ts`, so the agent-dialogue mod can show the same file), `comment {round, text}`, `summary {round, text}`,
   `doc {path, isModFit}`. The state is rebuilt by folding the events, which is also how a conversation resumes.
-- `ideia.md`: written at the end. Sections: the idea in one sentence; what went in (each decision, why, who brought
-  it); what was left out and why; risks and open questions; first steps (3–5); how the conversation went (pairs per
-  round, the user's comments). With `obsidian` on: frontmatter `date`, `description` (the one-sentence idea, ≤ 150
+- `ideia.md`: written at the end, for someone who did not read the dialogue: a title and the idea in one sentence
+  (`> ` line; a callout in Obsidian format), then In short (3–5 bullets), What we will do (each decision in bold, why,
+  who brought it), What was left out, Risks and how to reduce them, Open questions, First steps (a `- [ ]`
+  checklist, the first doable today), Terms used (every method, tool or jargon in one plain sentence), and How the
+  conversation went (built by the mod: pair and summary per round, the user's comments). Sides are named by letter and
+  point of view ("A (Open)"), never "side A". When it is done the pane shows the sentence and the In short bullets.
+  (Revised 2026-10-16 after the first real run, whose document was accurate but hard to scan.) With `obsidian` on: frontmatter `date`, `description` (the one-sentence idea, ≤ 150
   characters), `tags: [thinking, ideia]`.
 
 The last conversation's folder is kept in `$.store` (`ideia:last`), so `/ideia` in a later session can offer to

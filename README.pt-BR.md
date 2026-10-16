@@ -86,7 +86,7 @@ o que aparece na tela, atalhos e como instalar.
 | [agent-dialogue](skills/claude-mod-forge/examples/agent-dialogue/README.pt-BR.md) | A conversa entre dois agentes que revisam um trabalho, ao vivo |
 | [ideia](skills/claude-mod-forge/examples/ideia/README.pt-BR.md) | Dois pensadores com pontos de vista diferentes refinam sua ideia em diálogo; você direciona, ele escreve o plano |
 
-Todos passam nas três checagens (110 testes no total). Os que mostram texto têm a opção `language`: inglês por
+Todos passam nas três checagens (111 testes no total). Os que mostram texto têm a opção `language`: inglês por
 padrão, ou `pt-BR`.
 
 ## Instalação

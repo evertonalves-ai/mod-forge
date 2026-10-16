@@ -38,7 +38,7 @@ Você escreve uma ideia crua, como "um app para controlar gastos do mês". Dois 
 Você também pode escrever o seu par (`e`), como "investidor × cliente"; aí cada lado escolhe o próprio método e diz qual usou.
 
 ### O que fica salvo
-Cada conversa ganha uma subpasta com a data e as primeiras palavras da ideia (por exemplo `2026-10-15-um-app-para-controlar-gastos-do-mes`). Dentro dela: `dialogue.jsonl`, a conversa inteira, uma linha por mensagem, e `ideia.md`, o documento final, com estas seções: a ideia em uma frase, o que entrou (cada decisão, o motivo e quem trouxe), o que ficou de fora, riscos e perguntas em aberto, primeiros passos e como a conversa andou.
+Cada conversa ganha uma subpasta com a data e as primeiras palavras da ideia (por exemplo `2026-10-15-um-app-para-controlar-gastos-do-mes`). Dentro dela: `dialogue.jsonl`, a conversa inteira, uma linha por mensagem, e `ideia.md`, o documento final, escrito para quem não acompanhou a conversa: a ideia em uma frase, um resumo curto, o que vamos fazer (cada decisão, o motivo e quem trouxe), o que ficou de fora, os riscos com como reduzir cada um, as perguntas em aberto, os primeiros passos em lista para marcar, os termos técnicos explicados em palavras simples e como a conversa andou rodada a rodada. Quando fica pronto, o painel mostra a frase e o resumo.
 
 ## Atalhos de teclado
 | Tecla | O que faz |
@@ -96,7 +96,7 @@ claude --plugin-dir caminho/para/ideia
 Para deixar instalado de vez, peça à skill `claude-mod-forge` para empacotar ("empacote este mod").
 
 ## Conferir
-Na pasta da skill (`skills/claude-mod-forge`), este comando confere o manifesto, os tipos em modo estrito e roda os 21 testes automáticos deste mod:
+Na pasta da skill (`skills/claude-mod-forge`), este comando confere o manifesto, os tipos em modo estrito e roda os 22 testes automáticos deste mod:
 
 ```bash
 node scripts/check-mod.mjs examples/ideia

@@ -35,6 +35,7 @@ declare module 'claude-code' {
       resumeDir: string
       resumeEvents: IdeiaEvent[]
       isPausing: boolean
+      preview: string
     }
   }
 }

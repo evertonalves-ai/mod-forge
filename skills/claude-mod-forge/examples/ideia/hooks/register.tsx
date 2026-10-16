@@ -2,7 +2,7 @@ import { atom, read, update } from 'claude-code'
 import type { EngineInterface, Register } from 'claude-code'
 
 import type { Busy, IdeiaEvent, Language, Pair, Suggestion, View, Who } from '../types'
-import { buildDoc } from './doc'
+import { buildDoc, previewOf } from './doc'
 import { clampRounds, currentRound, fold, isoDate, nextAction, pairFor, parseEvents, parseModFit, parseStatus, slug, toJsonl } from './flow'
 import { compact, language, strings } from './i18n'
 import type { Strings } from './i18n'
@@ -33,6 +33,7 @@ const tokens = atom({ plugin: 'ideia', key: 'tokens' } as const, 0)
 const resumeDir = atom({ plugin: 'ideia', key: 'resumeDir' } as const, '')
 const resumeEvents = atom({ plugin: 'ideia', key: 'resumeEvents' } as const, [])
 const isPausing = atom({ plugin: 'ideia', key: 'isPausing' } as const, false)
+const preview = atom({ plugin: 'ideia', key: 'preview' } as const, '')
 
 // The runner's controls. Module state: one runner per session.
 let isRunning = false
@@ -101,6 +102,7 @@ async function writeDoc($: EngineInterface, ctx: Ctx) {
   } catch {
     throw new Failure(ctx.t.writeFailed)
   }
+  await update($, preview, () => previewOf(doc, ctx.lang))
   await append($, ctx, { type: 'doc', path, isModFit: check.isModFit, ts: await ts($) })
   await setView($, 'done')
 }
@@ -515,6 +517,10 @@ export const register: Register = (on, options) => {
 
         {v === 'done' && (
           <Box flexDirection="column" gap={1}>
+            {await (async () => {
+              const text = await read($, preview)
+              return text === '' ? null : <Text wrap="wrap">{text}</Text>
+            })()}
             <Text color="success">{t.saved(convo.doc?.path ?? '')}</Text>
             <Box gap={2}>
               {convo.doc?.isModFit === true &&

@@ -101,12 +101,19 @@ test('slug, rounds and the jsonl round trip', () => {
 
 test('the document: fence removed, history section exact, frontmatter on request', () => {
   expect(unfence('```markdown\n# T\n```')).toBe('# T')
-  const written = '# Budget bar\n\n## The idea in one sentence\n\nA spending app whose budget empties like a "bar".\n\n## First steps\n\n- Sketch it'
-  const plain = buildDoc(written, fold(round1), 'en', { obsidian: false, date: '2026-10-15' })
-  expect(plain).toContain('## How the conversation went\n\n- Round 1: Open × Narrow')
-  expect(plain).toContain('- focus on people aged 18 to 25')
+  const written = '# Budget bar\n\n> A spending app whose budget empties like a "bar".\n\n## In short\n\n- **For** young adults\n\n## First steps\n\n- [ ] Sketch it'
+  const summed = fold([...round1, { type: 'summary', round: 1, text: 'Decided: the bar\n- Open: bank import', ts: TS }])
+  const plain = buildDoc(written, summed, 'en', { obsidian: false, date: '2026-10-15' })
+  expect(plain).toContain('## How the conversation went\n\n**Round 1 · Open × Narrow**\n- Decided: the bar\n- Open: bank import')
+  expect(plain).toContain('**Your comments:**\n- focus on people aged 18 to 25')
   expect(plain.startsWith('# Budget bar')).toBe(true)
-  const withFm = buildDoc(written, fold(round1), 'en', { obsidian: true, date: '2026-10-15' })
+  const withFm = buildDoc(written, summed, 'en', { obsidian: true, date: '2026-10-15' })
   expect(withFm.startsWith('---\ndate: 2026-10-15\ndescription: "A spending app whose budget empties like a \\"bar\\"."\ntags:\n  - thinking\n  - ideia\n---')).toBe(true)
+  expect(withFm).toContain('> [!abstract] In one sentence\n> A spending app')
+  expect(oneSentence('## In short\n\n- **For** young adults', fold(round1), 'en')).toBe('For young adults')
   expect(oneSentence('no sections here', fold(round1), 'en')).toBe('An app to track monthly spending')
+  const prompt = writerPrompt(fold(round1), 'pt-BR')
+  expect(prompt).toContain('## Termos usados')
+  expect(prompt).toContain('Nunca escreva "side A"')
+  expect(prompt).toContain('"- [ ] "')
 })

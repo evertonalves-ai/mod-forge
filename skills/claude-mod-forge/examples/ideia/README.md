@@ -38,7 +38,7 @@ You type a raw idea, such as "an app to track monthly spending". Two thinkers, A
 You can also write your own pair (`e`), such as "investor × customer"; then each side picks its own method and says which.
 
 ### What gets saved
-Each conversation gets its own subfolder, named with the date and the first words of the idea (for example `2026-10-15-an-app-to-track-monthly-spending`). Inside: `dialogue.jsonl`, the whole conversation, one line per message, and `ideia.md`, the final document, with these sections: the idea in one sentence, what went in (each decision, why, and who brought it), what was left out, risks and open questions, first steps, and how the conversation went.
+Each conversation gets its own subfolder, named with the date and the first words of the idea (for example `2026-10-15-an-app-to-track-monthly-spending`). Inside: `dialogue.jsonl`, the whole conversation, one line per message, and `ideia.md`, the final document, written for someone who did not follow the conversation: the idea in one sentence, a short summary, what will be done (each decision, why, and who brought it), what was left out, risks with how to reduce each one, open questions, first steps as a checklist, the technical terms explained in plain words, and how the conversation went round by round. When it is ready, the panel shows the sentence and the summary.
 
 ## Keyboard shortcuts
 | Key | What it does |
@@ -96,7 +96,7 @@ claude --plugin-dir path/to/ideia
 To keep it installed for good, ask the `claude-mod-forge` skill to package it ("package this mod").
 
 ## Check it
-From the skill folder (`skills/claude-mod-forge`), this runs the manifest check, a strict type check and the 21 automated tests of this mod:
+From the skill folder (`skills/claude-mod-forge`), this runs the manifest check, a strict type check and the 22 automated tests of this mod:
 
 ```bash
 node scripts/check-mod.mjs examples/ideia

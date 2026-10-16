@@ -86,7 +86,7 @@ does, what you see, shortcuts and how to install it.
 | [agent-dialogue](skills/claude-mod-forge/examples/agent-dialogue/README.md) | The conversation between two reviewing agents, live |
 | [ideia](skills/claude-mod-forge/examples/ideia/README.md) | Two thinkers with different points of view refine your idea by dialogue; you steer, it writes the plan |
 
-All pass the three checks (110 tests in total). Those with on-screen text have a `language` option: English by
+All pass the three checks (111 tests in total). Those with on-screen text have a `language` option: English by
 default, or `pt-BR`. The [examples table](skills/claude-mod-forge/examples/README.md) lists the hooks and API
 calls each one demonstrates.
 
@@ -139,7 +139,7 @@ skills/claude-mod-forge/
   references/            official docs map, interview, category quizzes, API, events, UI + design system,
                          state, security, testing, distribution, surfaces, idea catalog
   templates/             project spec · requirements · test plan · security review · release checklist
-  examples/              13 reference mods, 110 kit tests, a README per mod (en + pt-BR)
+  examples/              13 reference mods, 111 kit tests, a README per mod (en + pt-BR)
   scripts/check-mod.mjs  validate + strict tsc + claude plugin test, in one run
   scripts/say.mjs        shared dialogue file for a two-agent review round (shown by agent-dialogue)
   tests/                 acceptance (A–J), discovery and regression definitions + RESULTS.md
