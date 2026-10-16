@@ -276,3 +276,18 @@ test('resume ignores a saved folder outside the configured one', WITH(), async (
   expect(await ui.find({ key: 'idea' })).toBeDefined()
   expect(await ui.find({ key: 'resume' })).toBeUndefined()
 })
+
+test('the menu works while the pair loads; a reload keeps a suggestion that already arrived', WITH(), async ($, on) => {
+  const { clock, calls } = engine(on)
+  on('session.start', () => ({ cwd: '/work' }))
+  on('command.register', ($, e) => ({ value: { command: e.name } }))
+  await $.command.run({ command: 'ideia', args: IDEA, ...TYPED })
+  const ui = await $.ui.mount({ ...PANE, surface: 'desktop' })
+  expect(await ui.find({ key: 'pick' })).toBeDefined()
+  await clock.settle()
+  const before = calls.filter(c => c.prompt.includes('Pick the pair')).length
+  await $.session.start({ surface: 'desktop', isInteractive: true, cwd: '/work' })
+  await clock.settle()
+  expect(calls.filter(c => c.prompt.includes('Pick the pair')).length).toBe(before)
+  expect(await ui.find({ text: 'Suggested pair: User × Engineering' })).toBeDefined()
+})

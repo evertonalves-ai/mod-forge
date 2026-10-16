@@ -277,6 +277,10 @@ export const register: Register = (on, options) => {
     // A reload ends the runner; a conversation that was mid-flight waits for "resume".
     const v = await read($, view)
     if (v === 'running' || v === 'finishing') await setView($, 'paused')
+    await setBusy($, '')
+    // A suggestion cut by the reload is asked again, so the choice never waits forever.
+    const idea = fold(await read($, events)).idea
+    if (v === 'choosing' && idea !== '' && (await read($, suggestion)) === null) void suggest($, ctx, idea)
     try {
       await $.command.register({ name: 'ideia', description: t.commandDescription, argumentHint: '[idea]', immediate: true })
     } catch {
@@ -426,15 +430,24 @@ export const register: Register = (on, options) => {
             <Text dimColor>{`“${convo.idea}”`}</Text>
             {await (async () => {
               const s = await read($, suggestion)
-              if (!s) return <Text dimColor>{t.suggesting}</Text>
+              const others = [
+                button('pick', t.pick, 'p', () => update($, menu, x => (x === 'pick' ? '' : 'pick'))),
+                button('custom', t.custom, 'e', () => update($, menu, x => (x === 'custom' ? '' : 'custom'))),
+              ]
+              // While the suggestion loads, the menu and a custom pair are already usable.
+              if (!s) return (
+                <Box flexDirection="column">
+                  <Text dimColor>{t.suggesting}</Text>
+                  <Box gap={2}>{others}</Box>
+                </Box>
+              )
               return (
                 <Box flexDirection="column">
                   <Text bold>{`${t.suggested}: ${s.pair.a.lens} × ${s.pair.b.lens}`}</Text>
                   <Text wrap="wrap" dimColor>{s.why}</Text>
                   <Box gap={2}>
                     {button('accept', t.accept, 'a', () => choosePair($, ctx, s.pair, s.why))}
-                    {button('pick', t.pick, 'p', () => update($, menu, x => (x === 'pick' ? '' : 'pick')))}
-                    {button('custom', t.custom, 'e', () => update($, menu, x => (x === 'custom' ? '' : 'custom')))}
+                    {others}
                   </Box>
                 </Box>
               )
